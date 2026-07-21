@@ -1,21 +1,144 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Edit, Search } from "lucide-react";
-import { useState } from "react";
-import { products, formatNaira, type Product } from "@/data/products";
+import { Plus, Edit, Search, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { formatNaira, type Product } from "@/data/products";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
+import { ImageUpload } from "@/components/admin/ImageUpload";
+import {
+  useAdminProducts,
+  getProductImage,
+  getAllProducts,
+} from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/admin/products")({
   component: AdminProducts,
 });
 
+const APPAREL_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+
+type FormState = {
+  name: string;
+  price: number;
+  category: "Apparel" | "Publications";
+  availability: "in-stock" | "pre-order";
+  shortDescription: string;
+  description: string;
+  sizes: string[];
+  image: string;
+};
+
+const emptyForm: FormState = {
+  name: "",
+  price: 0,
+  category: "Apparel",
+  availability: "in-stock",
+  shortDescription: "",
+  description: "",
+  sizes: [],
+  image: "",
+};
+
 function AdminProducts() {
   const [search, setSearch] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [form, setForm] = useState<FormState>(emptyForm);
 
-  const filtered = products.filter((p) =>
+  const {
+    customImages,
+    customProducts,
+    updatedProducts,
+    setProductImage,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+  } = useAdminProducts();
+
+  const allProducts = useMemo(
+    () => getAllProducts(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [customImages, customProducts, updatedProducts],
+  );
+
+  const filtered = allProducts.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const openAdd = () => {
+    setEditingProduct(null);
+    setForm({ ...emptyForm, image: "" });
+    setShowAddModal(true);
+  };
+
+  const openEdit = (product: Product) => {
+    setEditingProduct(product);
+    const customImg = customImages[product.id] ?? "";
+    setForm({
+      name: product.name,
+      price: product.price,
+      category: product.category,
+      availability: product.availability,
+      shortDescription: product.shortDescription,
+      description: product.description,
+      sizes: product.sizes ?? [],
+      image: customImg,
+    });
+    setShowAddModal(true);
+  };
+
+  const closeModal = () => {
+    setShowAddModal(false);
+    setEditingProduct(null);
+  };
+
+  const handleSave = () => {
+    if (!form.name || !form.price) return;
+
+    if (editingProduct) {
+      if (form.image) {
+        setProductImage(editingProduct.id, form.image);
+      }
+      updateProduct(editingProduct.id, {
+        name: form.name,
+        price: form.price,
+        category: form.category,
+        availability: form.availability,
+        shortDescription: form.shortDescription,
+        description: form.description,
+        sizes: form.sizes.length > 0 ? form.sizes : null,
+      });
+    } else {
+      const id = form.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "");
+      const newProduct: Product = {
+        id: `custom-${id}-${Date.now()}`,
+        name: form.name,
+        price: form.price,
+        category: form.category,
+        image: "",
+        shortDescription: form.shortDescription,
+        description: form.description,
+        sizes: form.sizes.length > 0 ? form.sizes : null,
+        availability: form.availability,
+      };
+      addProduct(newProduct);
+      if (form.image) {
+        setProductImage(newProduct.id, form.image);
+      }
+    }
+    closeModal();
+  };
+
+  const toggleSize = (s: string) => {
+    setForm((f) => ({
+      ...f,
+      sizes: f.sizes.includes(s)
+        ? f.sizes.filter((x) => x !== s)
+        : [...f.sizes, s],
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -25,11 +148,12 @@ function AdminProducts() {
             Product Management
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your merchandise catalog.
+            Manage your merchandise catalog. Upload images, add new products,
+            edit details.
           </p>
         </div>
         <button
-          onClick={() => setShowAddModal(true)}
+          onClick={openAdd}
           className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
         >
           <Plus className="h-4 w-4" /> Add Product
@@ -46,7 +170,6 @@ function AdminProducts() {
         />
       </div>
 
-      {/* Products table */}
       <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -78,7 +201,7 @@ function AdminProducts() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <img
-                        src={product.image}
+                        src={getProductImage(product.id, product.image)}
                         alt={product.name}
                         className="h-10 w-10 rounded-lg object-cover"
                       />
@@ -107,11 +230,19 @@ function AdminProducts() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
                       <button
-                        onClick={() => setEditingProduct(product)}
+                        onClick={() => openEdit(product)}
                         className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground"
                       >
                         <Edit className="h-4 w-4" />
                       </button>
+                      {product.id.startsWith("custom-") && (
+                        <button
+                          onClick={() => deleteProduct(product.id)}
+                          className="grid h-8 w-8 place-items-center rounded-lg text-muted-foreground hover:bg-red-50 hover:text-red-600"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -126,35 +257,43 @@ function AdminProducts() {
         )}
       </div>
 
-      {/* Add/Edit Modal placeholder */}
-      {(showAddModal || editingProduct) && (
+      {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="font-display text-xl font-bold text-foreground">
                 {editingProduct ? "Edit Product" : "Add Product"}
               </h3>
               <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setEditingProduct(null);
-                }}
+                onClick={closeModal}
                 className="text-muted-foreground hover:text-foreground"
               >
                 ✕
               </button>
             </div>
-            <div className="mt-4 space-y-4">
+
+            <div className="mt-5 space-y-5">
+              <ImageUpload
+                value={form.image}
+                onChange={(dataUrl) =>
+                  setForm((f) => ({ ...f, image: dataUrl }))
+                }
+              />
+
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">
                   Product Name
                 </label>
                 <input
-                  defaultValue={editingProduct?.name}
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, name: e.target.value }))
+                  }
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                   placeholder="Product name"
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-foreground">
@@ -162,7 +301,13 @@ function AdminProducts() {
                   </label>
                   <input
                     type="number"
-                    defaultValue={editingProduct?.price}
+                    value={form.price || ""}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        price: Number(e.target.value),
+                      }))
+                    }
                     className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                   />
                 </div>
@@ -171,7 +316,13 @@ function AdminProducts() {
                     Category
                   </label>
                   <select
-                    defaultValue={editingProduct?.category}
+                    value={form.category}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        category: e.target.value as "Apparel" | "Publications",
+                      }))
+                    }
                     className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                   >
                     <option>Apparel</option>
@@ -179,49 +330,95 @@ function AdminProducts() {
                   </select>
                 </div>
               </div>
+
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">
                   Availability
                 </label>
                 <select
-                  defaultValue={editingProduct?.availability}
+                  value={form.availability}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      availability: e.target.value as
+                        | "in-stock"
+                        | "pre-order",
+                    }))
+                  }
                   className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                 >
                   <option value="in-stock">In Stock</option>
                   <option value="pre-order">Pre-Order</option>
                 </select>
               </div>
+
+              {form.category === "Apparel" && (
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-foreground">
+                    Sizes
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {APPAREL_SIZES.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => toggleSize(s)}
+                        className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
+                          form.sizes.includes(s)
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-foreground hover:border-primary/30"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">
                   Short Description
                 </label>
                 <textarea
-                  defaultValue={editingProduct?.shortDescription}
+                  value={form.shortDescription}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      shortDescription: e.target.value,
+                    }))
+                  }
                   rows={2}
                   className="w-full resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                 />
               </div>
+
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">
                   Full Description
                 </label>
                 <textarea
-                  defaultValue={editingProduct?.description}
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, description: e.target.value }))
+                  }
                   rows={3}
                   className="w-full resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
                 />
               </div>
+
               <div className="flex justify-end gap-3 pt-2">
                 <button
-                  onClick={() => {
-                    setShowAddModal(false);
-                    setEditingProduct(null);
-                  }}
+                  onClick={closeModal}
                   className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium text-foreground"
                 >
                   Cancel
                 </button>
-                <button className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground">
+                <button
+                  onClick={handleSave}
+                  disabled={!form.name || !form.price}
+                  className="rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                >
                   {editingProduct ? "Save Changes" : "Add Product"}
                 </button>
               </div>

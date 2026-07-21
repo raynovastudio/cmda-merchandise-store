@@ -4,6 +4,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { formatNaira, getProduct } from "@/data/products";
 import { useCart, useCartSubtotal } from "@/stores/cart";
+import { getProductImage, resolveProduct } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -58,7 +59,7 @@ function CartPage() {
           <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
             <ul className="space-y-3">
               {items.map((item) => {
-                const p = getProduct(item.productId);
+                const p = resolveProduct(item.productId);
                 if (!p) return null;
                 return (
                   <li
@@ -71,7 +72,7 @@ function CartPage() {
                       className="overflow-hidden rounded-xl bg-muted"
                     >
                       <img
-                        src={p.image}
+                        src={getProductImage(p.id, p.image)}
                         alt={p.name}
                         width={240}
                         height={300}

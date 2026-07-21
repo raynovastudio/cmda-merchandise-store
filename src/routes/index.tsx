@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Package, Sparkles, Truck, HandHeart } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
-import { products } from "@/data/products";
+import { getAllProducts } from "@/stores/adminProducts";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const Route = createFileRoute("/")({
@@ -10,7 +10,8 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const featured = products.filter((p) => p.featured);
+  const allProducts = getAllProducts();
+  const featured = allProducts.filter((p) => p.featured);
 
   return (
     <SiteLayout>
@@ -181,7 +182,7 @@ function Index() {
               </Link>
             </div>
             <div className="grid grid-cols-2 gap-5">
-              {products
+              {allProducts
                 .filter((p) => p.category === "Publications")
                 .map((p) => (
                   <ProductCard key={p.id} product={p} />

@@ -4,13 +4,14 @@ import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { ProductCard } from "@/components/site/ProductCard";
-import { formatNaira, getProduct, products } from "@/data/products";
+import { formatNaira, getProduct } from "@/data/products";
 import { useCart } from "@/stores/cart";
 import { cn } from "@/lib/utils";
+import { getProductImage, getAllProducts, resolveProduct } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ params }) => {
-    const product = getProduct(params.id);
+    const product = resolveProduct(params.id);
     if (!product) throw notFound();
     return { product };
   },
@@ -87,7 +88,7 @@ function ProductPage() {
   const needsSize = !!product.sizes;
   const canAdd = !needsSize || !!size;
 
-  const related = products.filter((p) => p.id !== product.id).slice(0, 3);
+  const related = getAllProducts().filter((p) => p.id !== product.id).slice(0, 3);
 
   const handleAdd = () => {
     if (!canAdd) return;
@@ -110,7 +111,7 @@ function ProductPage() {
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 sm:px-6 md:grid-cols-2 lg:px-8">
         <div className="relative overflow-hidden rounded-[2rem] border border-border/40 bg-muted shadow-card">
           <img
-            src={product.image}
+            src={getProductImage(product.id, product.image)}
             alt={product.name}
             width={1024}
             height={1280}

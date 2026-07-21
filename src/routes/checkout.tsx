@@ -26,6 +26,7 @@ import {
 } from "@/stores/orders";
 import { conferences, nigerianStates } from "@/data/conferences";
 import { cn } from "@/lib/utils";
+import { getProductImage, resolveProduct } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -227,14 +228,14 @@ function CheckoutPage() {
       customerPhone: phone,
       membershipNumber,
       items: items.map((item) => {
-        const p = getProduct(item.productId)!;
+        const p = resolveProduct(item.productId)!;
         return {
           productId: item.productId,
           name: p.name,
           price: p.price,
           size: item.size,
           quantity: item.quantity,
-          image: p.image,
+          image: getProductImage(p.id, p.image),
         };
       }),
       fulfillmentMethod,
@@ -990,7 +991,7 @@ function CheckoutPage() {
             <p className="font-display text-xl font-bold text-foreground">Order Summary</p>
             <ul className="mt-4 space-y-3">
               {items.map((item) => {
-                const p = getProduct(item.productId);
+                const p = resolveProduct(item.productId);
                 if (!p) return null;
                 return (
                   <li
@@ -998,7 +999,7 @@ function CheckoutPage() {
                     className="flex items-center gap-3 text-sm"
                   >
                     <img
-                      src={p.image}
+                      src={getProductImage(p.id, p.image)}
                       alt={p.name}
                       className="h-12 w-12 rounded-lg object-cover"
                     />

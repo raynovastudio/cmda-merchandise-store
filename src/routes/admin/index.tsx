@@ -8,7 +8,8 @@ import {
   Users,
 } from "lucide-react";
 import { useOrders } from "@/stores/orders";
-import { products, formatNaira } from "@/data/products";
+import { formatNaira } from "@/data/products";
+import { getAllProducts } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/admin/")({
   component: AdminDashboard,
@@ -24,8 +25,9 @@ function AdminDashboard() {
   const completedOrders = orders.filter(
     (o) => o.status === "completed" || o.status === "delivered",
   ).length;
-  const totalProducts = products.length;
-  const inStockProducts = products.filter(
+  const allProducts = getAllProducts();
+  const totalProducts = allProducts.length;
+  const inStockProducts = allProducts.filter(
     (p) => p.availability === "in-stock",
   ).length;
 

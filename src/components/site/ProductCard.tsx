@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatNaira } from "@/data/products";
 import { AvailabilityBadge } from "./AvailabilityBadge";
+import { getProductImage } from "@/stores/adminProducts";
 
 export function ProductCard({ product }: { product: Product }) {
   return (
@@ -13,7 +14,7 @@ export function ProductCard({ product }: { product: Product }) {
     >
       <div className="relative aspect-[4/5] overflow-hidden bg-muted">
         <img
-          src={product.image}
+          src={getProductImage(product.id, product.image)}
           alt={product.name}
           loading="lazy"
           width={1024}

@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getProduct, type Product } from "@/data/products";
 
 export type FulfillmentMethod = "conference-pickup" | "delegate-pickup" | "delivery";
 

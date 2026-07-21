@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { getProduct } from "@/data/products";
+import { resolveProduct } from "@/stores/adminProducts";
 
 export type CartItem = {
   key: string; // productId + size
@@ -57,7 +57,7 @@ export const useCartCount = () =>
 export const useCartSubtotal = () =>
   useCart((s) =>
     s.items.reduce((sum, i) => {
-      const p = getProduct(i.productId);
+      const p = resolveProduct(i.productId);
       return sum + (p ? p.price * i.quantity : 0);
     }, 0),
   );
