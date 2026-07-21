@@ -110,16 +110,16 @@ export function OrderTimeline({ order }: { order: Order }) {
 export function StatusBadge({ status }: { status: OrderStatus }) {
   const colorMap: Record<OrderStatus, string> = {
     "awaiting-payment": "bg-preorder/90 text-preorder-foreground",
-    "payment-submitted": "bg-blue-50 text-blue-700",
+    "payment-submitted": "bg-blue-500/15 text-blue-400",
     "payment-verified": "bg-brand-green-soft text-brand-green",
     "preparing-order": "bg-primary-soft text-primary",
     "ready-for-conference-pickup": "bg-brand-green-soft text-brand-green",
     "ready-for-delegate-pickup": "bg-brand-green-soft text-brand-green",
     "ready-for-delivery": "bg-brand-green-soft text-brand-green",
-    shipped: "bg-blue-50 text-blue-700",
+    shipped: "bg-blue-500/15 text-blue-400",
     delivered: "bg-brand-green-soft text-brand-green",
     completed: "bg-brand-green text-white",
-    cancelled: "bg-destructive/10 text-destructive",
+    cancelled: "bg-destructive/15 text-destructive",
   };
 
   return (

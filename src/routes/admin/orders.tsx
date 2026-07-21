@@ -233,7 +233,7 @@ function AdminOrders() {
                         status: "cancelled",
                       });
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-destructive/10 px-4 py-2 text-sm font-semibold text-destructive"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-destructive/15 px-4 py-2 text-sm font-semibold text-destructive"
                   >
                     <XCircle className="h-4 w-4" /> Reject Payment
                   </button>
