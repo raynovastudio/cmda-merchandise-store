@@ -24,7 +24,8 @@ import {
   type FulfillmentMethod,
   type PaymentProof,
 } from "@/stores/orders";
-import { conferences, nigerianStates } from "@/data/conferences";
+import { nigerianStates } from "@/data/conferences";
+import { useConferences } from "@/stores/conferences";
 import { cn } from "@/lib/utils";
 import { getProductImage, resolveProduct } from "@/stores/adminProducts";
 
@@ -51,6 +52,7 @@ function CheckoutPage() {
   const items = useCart((s) => s.items);
   const clear = useCart((s) => s.clear);
   const addOrder = useOrders((s) => s.addOrder);
+  const conferences = useConferences((s) => s.conferences);
 
   const [step, setStep] = useState<Step>("customer");
   const [submitted, setSubmitted] = useState(false);
