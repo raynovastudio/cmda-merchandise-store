@@ -35,7 +35,7 @@ function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="dark flex h-screen overflow-hidden">
+    <div className="dark flex h-screen overflow-hidden bg-background text-foreground">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
@@ -54,7 +54,7 @@ function AdminLayout() {
         {/* Sidebar header */}
         <div className="flex items-center gap-3 border-b border-border px-5 py-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/20">
-            <LogoMark className="h-6 w-auto" />
+            <LogoMark className="h-6 w-auto brightness-0 invert" />
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm font-semibold text-foreground">CMDA Store</p>
