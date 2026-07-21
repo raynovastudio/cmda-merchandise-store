@@ -1,9 +1,3 @@
-import cargoShirt from "@/assets/product-cargo-shirt.jpg";
-import faceCap from "@/assets/product-face-cap.jpg";
-import polo from "@/assets/product-polo.jpg";
-import magazine from "@/assets/product-magazine.jpg";
-import handbook from "@/assets/product-handbook.jpg";
-
 export type Availability = "in-stock" | "pre-order";
 
 export type ProductColor = {
@@ -35,7 +29,7 @@ export const products: Product[] = [
     name: "CMDA Cargo Shirt",
     category: "Apparel",
     price: 14000,
-    image: cargoShirt,
+    image: "",
     shortDescription:
       "Signature plum cargo shirt with utility pockets — a versatile mission staple.",
     description:
@@ -55,7 +49,7 @@ export const products: Product[] = [
     name: "CMDA Face Cap",
     category: "Apparel",
     price: 5000,
-    image: faceCap,
+    image: "",
     shortDescription:
       "Structured embroidered cap in signature CMDA plum. One size, adjustable fit.",
     description:
@@ -75,7 +69,7 @@ export const products: Product[] = [
     name: "Wholeness Missions Outreach Polo",
     category: "Apparel",
     price: 10000,
-    image: polo,
+    image: "",
     shortDescription:
       "Premium pique polo with green trim — the official outreach uniform.",
     description:
@@ -94,7 +88,7 @@ export const products: Product[] = [
     name: "Wholeness Magazine",
     category: "Publications",
     price: 3000,
-    image: magazine,
+    image: "",
     shortDescription:
       "The flagship CMDA Nigeria magazine — stories, teaching, and mission dispatches.",
     description:
@@ -109,7 +103,7 @@ export const products: Product[] = [
     name: "Logo Exploration Handbook",
     category: "Publications",
     price: 1500,
-    image: handbook,
+    image: "",
     shortDescription:
       "A concise guide to the meaning and use of the CMDA Nigeria identity.",
     description:

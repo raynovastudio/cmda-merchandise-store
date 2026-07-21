@@ -4,8 +4,11 @@ import type { Product } from "@/data/products";
 import { formatNaira } from "@/data/products";
 import { AvailabilityBadge } from "./AvailabilityBadge";
 import { getProductImage } from "@/stores/adminProducts";
+import { ImagePlaceholder } from "@/components/admin/ImagePlaceholder";
 
 export function ProductCard({ product }: { product: Product }) {
+  const imgSrc = getProductImage(product.id, product.image);
+
   return (
     <Link
       to="/product/$id"
@@ -13,12 +16,16 @@ export function ProductCard({ product }: { product: Product }) {
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/40 bg-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.12)]"
     >
       <div className="relative aspect-[3/4] overflow-hidden bg-gradient-to-br from-muted via-muted/80 to-muted/60">
-        <img
-          src={getProductImage(product.id, product.image)}
-          alt={product.name}
-          loading="lazy"
-          className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
-        />
+        {imgSrc ? (
+          <img
+            src={imgSrc}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-all duration-700 ease-out group-hover:scale-110"
+          />
+        ) : (
+          <ImagePlaceholder className="h-full w-full" />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
         <div className="absolute left-3 top-3 flex flex-col gap-1.5">
           <AvailabilityBadge availability={product.availability} />

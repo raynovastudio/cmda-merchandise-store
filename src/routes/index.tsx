@@ -3,7 +3,6 @@ import { ArrowRight, Package, Sparkles, Truck, HandHeart } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
 import { getAllProducts } from "@/stores/adminProducts";
-import heroImage from "@/assets/hero-image.jpg";
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -74,7 +73,7 @@ function Index() {
             <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-soft via-background to-brand-green-soft blur-2xl opacity-60" />
             <div className="relative overflow-hidden rounded-[2rem] border border-border/40 shadow-card-hover">
               <img
-                src={heroImage}
+                src="/hero-image.jpg"
                 alt="CMDA Nigeria members in branded merchandise"
                 width={1600}
                 height={1200}

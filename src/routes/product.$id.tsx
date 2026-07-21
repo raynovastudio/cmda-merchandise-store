@@ -8,6 +8,7 @@ import { formatNaira, getProduct, type ProductColor } from "@/data/products";
 import { useCart } from "@/stores/cart";
 import { cn } from "@/lib/utils";
 import { getProductImage, getAllProducts, resolveProduct } from "@/stores/adminProducts";
+import { ImagePlaceholder } from "@/components/admin/ImagePlaceholder";
 
 export const Route = createFileRoute("/product/$id")({
   loader: ({ params }) => {
@@ -114,11 +115,15 @@ function ProductPage() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 sm:px-6 md:grid-cols-2 lg:px-8">
         <div className="group/img relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-br from-muted via-muted/80 to-muted/60 shadow-card">
-          <img
-            src={getProductImage(product.id, product.image)}
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-105"
-          />
+          {getProductImage(product.id, product.image) ? (
+            <img
+              src={getProductImage(product.id, product.image)}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-105"
+            />
+          ) : (
+            <ImagePlaceholder className="h-full min-h-[400px] w-full" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
           <div className="absolute left-4 top-4">
             <AvailabilityBadge availability={product.availability} />
