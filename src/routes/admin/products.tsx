@@ -96,6 +96,7 @@ function AdminProducts() {
       colors: product.colors ?? [],
       image: customImg || product.image,
     });
+    setShowAddModal(true);
   };
 
   const closeModal = () => {
