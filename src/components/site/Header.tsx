@@ -22,6 +22,7 @@ export function Header() {
         <Link to="/" className="flex shrink-0 items-center gap-2.5">
           <LogoMark className="h-10 w-auto shrink-0 sm:hidden" />
           <LogoFull className="hidden h-10 w-auto shrink-0 sm:block" />
+          <span className="font-display text-base font-bold text-foreground sm:text-lg">CMDA Nigeria</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
