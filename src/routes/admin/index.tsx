@@ -60,7 +60,7 @@ function AdminDashboard() {
       label: "Products",
       value: `${inStockProducts}/${totalProducts} in stock`,
       icon: Package,
-      color: "bg-secondary text-muted-foreground",
+      color: "bg-secondary text-foreground",
     },
   ];
 
