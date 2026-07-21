@@ -102,3 +102,11 @@ export function getAllProducts(): Product[] {
 export function resolveProduct(id: string): Product | undefined {
   return getAllProducts().find((p) => p.id === id);
 }
+
+export function useResolvedProduct(id: string): { product: Product; image: string } | undefined {
+  const products = useProducts();
+  const customImages = useAdminProducts((s) => s.customImages);
+  const product = products.find((p) => p.id === id);
+  if (!product) return undefined;
+  return { product, image: customImages[product.id] ?? product.image };
+}

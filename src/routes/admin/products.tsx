@@ -7,7 +7,7 @@ import { ImageUpload } from "@/components/admin/ImageUpload";
 import {
   useAdminProducts,
   useProducts,
-  getProductImage,
+  useProductImage,
 } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/admin/products")({
@@ -39,6 +39,17 @@ const emptyForm: FormState = {
   colors: [],
   image: "",
 };
+
+function RowImage({ product }: { product: Product }) {
+  const img = useProductImage(product.id, product.image);
+  return (
+    <img
+      src={img}
+      alt={product.name}
+      className="h-10 w-10 rounded-lg object-cover"
+    />
+  );
+}
 
 function AdminProducts() {
   const [search, setSearch] = useState("");
@@ -226,11 +237,7 @@ function AdminProducts() {
                 <tr key={product.id} className="hover:bg-secondary/30">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <img
-                        src={getProductImage(product.id, product.image)}
-                        alt={product.name}
-                        className="h-10 w-10 rounded-lg object-cover"
-                      />
+                      <RowImage product={product} />
                       <div>
                         <p className="font-medium text-foreground">
                           {product.name}

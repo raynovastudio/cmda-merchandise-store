@@ -18,7 +18,7 @@ import { useState, useRef } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { formatNaira, getProduct } from "@/data/products";
-import { useCart, useCartSubtotal } from "@/stores/cart";
+import { useCart, useCartSubtotal, type CartItem } from "@/stores/cart";
 import {
   useOrders,
   type FulfillmentMethod,
@@ -27,7 +27,7 @@ import {
 import { nigerianStates } from "@/data/conferences";
 import { useConferences } from "@/stores/conferences";
 import { cn } from "@/lib/utils";
-import { getProductImage, resolveProduct } from "@/stores/adminProducts";
+import { getProductImage, resolveProduct, useResolvedProduct } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -47,6 +47,27 @@ const STEPS: { key: Step; label: string; icon: typeof User }[] = [
   { key: "payment", label: "Payment", icon: CreditCard },
   { key: "review", label: "Review", icon: CheckCircle2 },
 ];
+
+function SummaryItem({ item }: { item: CartItem }) {
+  const resolved = useResolvedProduct(item.productId);
+  if (!resolved) return null;
+  const { product: p, image } = resolved;
+  return (
+    <li className="flex items-center gap-3 text-sm">
+      <img src={image} alt={p.name} className="h-12 w-12 rounded-lg object-cover" />
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-semibold text-foreground">{p.name}</p>
+        <p className="text-xs text-muted-foreground">
+          {[item.size && `Size: ${item.size}`, item.color && `Color: ${item.color}`]
+            .filter(Boolean)
+            .join(" · ") || "One size"}{" "}
+          × {item.quantity}
+        </p>
+      </div>
+      <p className="font-semibold text-foreground">{formatNaira(p.price * item.quantity)}</p>
+    </li>
+  );
+}
 
 function CheckoutPage() {
   const items = useCart((s) => s.items);
@@ -993,36 +1014,9 @@ function CheckoutPage() {
           <aside className="h-fit rounded-3xl border border-border/60 bg-card p-6 shadow-card">
             <p className="font-display text-xl font-bold text-foreground">Order Summary</p>
             <ul className="mt-4 space-y-3">
-              {items.map((item) => {
-                const p = resolveProduct(item.productId);
-                if (!p) return null;
-                return (
-                  <li
-                    key={item.key}
-                    className="flex items-center gap-3 text-sm"
-                  >
-                    <img
-                      src={getProductImage(p.id, p.image)}
-                      alt={p.name}
-                      className="h-12 w-12 rounded-lg object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-semibold text-foreground">
-                        {p.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {[item.size && `Size: ${item.size}`, item.color && `Color: ${item.color}`]
-                          .filter(Boolean)
-                          .join(" · ") || "One size"}{" "}
-                        × {item.quantity}
-                      </p>
-                    </div>
-                    <p className="font-semibold text-foreground">
-                      {formatNaira(p.price * item.quantity)}
-                    </p>
-                  </li>
-                );
-              })}
+              {items.map((item) => (
+                <SummaryItem key={item.key} item={item} />
+              ))}
             </ul>
             <dl className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
               <div className="flex justify-between">

@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
-import { formatNaira, getProduct } from "@/data/products";
-import { useCart, useCartSubtotal } from "@/stores/cart";
-import { getProductImage, resolveProduct } from "@/stores/adminProducts";
+import { formatNaira } from "@/data/products";
+import { useCart, useCartSubtotal, type CartItem } from "@/stores/cart";
+import { useResolvedProduct } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -16,6 +16,89 @@ export const Route = createFileRoute("/cart")({
   }),
   component: CartPage,
 });
+
+function CartItemRow({
+  item,
+  updateQuantity,
+  remove,
+}: {
+  item: CartItem;
+  updateQuantity: (key: string, qty: number) => void;
+  remove: (key: string) => void;
+}) {
+  const resolved = useResolvedProduct(item.productId);
+  if (!resolved) return null;
+  const { product: p, image } = resolved;
+
+  return (
+    <li className="grid grid-cols-[96px_1fr] gap-4 rounded-2xl border border-border/50 bg-card p-4 shadow-card sm:grid-cols-[120px_1fr_auto] sm:gap-6 sm:p-5">
+      <Link
+        to="/product/$id"
+        params={{ id: p.id }}
+        className="overflow-hidden rounded-xl bg-muted"
+      >
+        <img
+          src={image}
+          alt={p.name}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
+        />
+      </Link>
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              {p.category}
+            </p>
+            <Link
+              to="/product/$id"
+              params={{ id: p.id }}
+              className="mt-0.5 block font-display text-lg font-semibold text-foreground hover:text-primary"
+            >
+              {p.name}
+            </Link>
+            <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+              {item.size && <span>Size: {item.size}</span>}
+              {item.color && <span>Color: {item.color}</span>}
+              <AvailabilityBadge availability={p.availability} />
+            </div>
+          </div>
+          <p className="font-display text-base font-bold text-foreground">
+            {formatNaira(p.price * item.quantity)}
+          </p>
+        </div>
+
+        <div className="mt-3 flex items-center gap-3">
+          <div className="inline-flex items-center rounded-xl border border-border">
+            <button
+              onClick={() => updateQuantity(item.key, Math.max(1, item.quantity - 1))}
+              className="grid h-9 w-9 place-items-center text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Minus className="h-3.5 w-3.5" />
+            </button>
+            <span className="w-10 text-center text-sm font-semibold tabular-nums">
+              {item.quantity}
+            </span>
+            <button
+              onClick={() => updateQuantity(item.key, item.quantity + 1)}
+              className="grid h-9 w-9 place-items-center text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Plus className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <button
+            onClick={() => remove(item.key)}
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-red-50 hover:text-red-600"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Remove
+          </button>
+        </div>
+      </div>
+    </li>
+  );
+}
 
 function CartPage() {
   const items = useCart((s) => s.items);
@@ -58,90 +141,14 @@ function CartPage() {
         ) : (
           <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
             <ul className="space-y-3">
-              {items.map((item) => {
-                const p = resolveProduct(item.productId);
-                if (!p) return null;
-                return (
-                  <li
-                    key={item.key}
-                    className="grid grid-cols-[96px_1fr] gap-4 rounded-2xl border border-border/50 bg-card p-4 shadow-card sm:grid-cols-[120px_1fr_auto] sm:gap-6 sm:p-5"
-                  >
-                    <Link
-                      to="/product/$id"
-                      params={{ id: p.id }}
-                      className="overflow-hidden rounded-xl bg-muted"
-                    >
-                      <img
-                        src={getProductImage(p.id, p.image)}
-                        alt={p.name}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
-                      />
-                    </Link>
-
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-start justify-between gap-2">
-                        <div className="min-w-0">
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                            {p.category}
-                          </p>
-                          <Link
-                            to="/product/$id"
-                            params={{ id: p.id }}
-                            className="mt-0.5 block font-display text-lg font-semibold text-foreground hover:text-primary"
-                          >
-                            {p.name}
-                          </Link>
-                          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                            {item.size && <span>Size: {item.size}</span>}
-                            {item.color && <span>Color: {item.color}</span>}
-                            <AvailabilityBadge availability={p.availability} />
-                          </div>
-                        </div>
-                        <p className="font-display text-lg font-bold text-foreground sm:hidden">
-                          {formatNaira(p.price * item.quantity)}
-                        </p>
-                      </div>
-
-                      <div className="mt-4 flex flex-wrap items-center gap-3">
-                        <div className="inline-flex items-center rounded-xl border border-border bg-background">
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.key, item.quantity - 1)
-                            }
-                            className="grid h-9 w-9 place-items-center transition-colors hover:bg-secondary rounded-l-xl"
-                            aria-label="Decrease"
-                          >
-                            <Minus className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="w-8 text-center text-sm font-bold tabular-nums">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.key, item.quantity + 1)
-                            }
-                            className="grid h-9 w-9 place-items-center transition-colors hover:bg-secondary rounded-r-xl"
-                            aria-label="Increase"
-                          >
-                            <Plus className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => remove(item.key)}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-destructive"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" /> Remove
-                        </button>
-                      </div>
-                    </div>
-
-                    <p className="hidden self-center font-display text-lg font-bold text-foreground sm:block">
-                      {formatNaira(p.price * item.quantity)}
-                    </p>
-                  </li>
-                );
-              })}
+              {items.map((item) => (
+                <CartItemRow
+                  key={item.key}
+                  item={item}
+                  updateQuantity={updateQuantity}
+                  remove={remove}
+                />
+              ))}
             </ul>
 
             <aside className="h-fit rounded-2xl border border-border/50 bg-card p-6 shadow-card">

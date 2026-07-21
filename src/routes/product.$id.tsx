@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { formatNaira, getProduct, type ProductColor } from "@/data/products";
 import { useCart } from "@/stores/cart";
 import { cn } from "@/lib/utils";
-import { useProducts, getProductImage, resolveProduct } from "@/stores/adminProducts";
+import { useProducts, useResolvedProduct, resolveProduct } from "@/stores/adminProducts";
 import { ImagePlaceholder } from "@/components/admin/ImagePlaceholder";
 
 export const Route = createFileRoute("/product/$id")({
@@ -80,7 +80,10 @@ function ErrorView({ reset }: { error: Error; reset: () => void }) {
 }
 
 function ProductPage() {
-  const { product } = Route.useLoaderData();
+  const { product: loaderProduct } = Route.useLoaderData();
+  const resolved = useResolvedProduct(loaderProduct.id);
+  const product = resolved?.product ?? loaderProduct;
+  const productImage = resolved?.image ?? product.image;
   const add = useCart((s) => s.add);
   const [size, setSize] = useState<string | null>(product.sizes ? "" : null);
   const [color, setColor] = useState<string | null>(
@@ -116,9 +119,9 @@ function ProductPage() {
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 sm:px-6 md:grid-cols-2 lg:px-8">
         <div className="group/img relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-br from-muted via-muted/80 to-muted/60 shadow-card">
-          {getProductImage(product.id, product.image) ? (
+          {productImage ? (
             <img
-              src={getProductImage(product.id, product.image)}
+              src={productImage}
               alt={product.name}
               className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-105"
             />

@@ -3,11 +3,11 @@ import { ArrowUpRight } from "lucide-react";
 import type { Product } from "@/data/products";
 import { formatNaira } from "@/data/products";
 import { AvailabilityBadge } from "./AvailabilityBadge";
-import { getProductImage } from "@/stores/adminProducts";
+import { useProductImage } from "@/stores/adminProducts";
 import { ImagePlaceholder } from "@/components/admin/ImagePlaceholder";
 
 export function ProductCard({ product }: { product: Product }) {
-  const imgSrc = getProductImage(product.id, product.image);
+  const imgSrc = useProductImage(product.id, product.image);
 
   return (
     <Link
