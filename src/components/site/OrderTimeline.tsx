@@ -60,8 +60,8 @@ export function OrderTimeline({ order }: { order: Order }) {
                 className={cn(
                   "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 text-xs font-bold transition-all",
                   isActive
-                    ? "border-brand-green bg-brand-green text-white shadow-sm"
-                    : "border-border bg-background text-muted-foreground",
+                    ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
+                    : "border-gray-200 bg-gray-50 text-gray-400",
                 )}
               >
                 {isActive ? <Check className="h-3.5 w-3.5" strokeWidth={3} /> : idx + 1}
@@ -70,7 +70,7 @@ export function OrderTimeline({ order }: { order: Order }) {
                 <div
                   className={cn(
                     "w-0.5 flex-1 min-h-6",
-                    isPast || isCurrent ? "bg-brand-green" : "bg-border",
+                    isPast || isCurrent ? "bg-emerald-500" : "bg-gray-200",
                   )}
                 />
               )}
@@ -79,7 +79,7 @@ export function OrderTimeline({ order }: { order: Order }) {
               <p
                 className={cn(
                   "text-sm font-semibold",
-                  isActive ? "text-foreground" : "text-muted-foreground",
+                  isActive ? "text-gray-900" : "text-gray-400",
                 )}
               >
                 {ORDER_STATUS_LABELS[status]}
@@ -109,17 +109,17 @@ export function OrderTimeline({ order }: { order: Order }) {
 
 export function StatusBadge({ status }: { status: OrderStatus }) {
   const colorMap: Record<OrderStatus, string> = {
-    "awaiting-payment": "bg-preorder/90 text-preorder-foreground",
-    "payment-submitted": "bg-blue-500/15 text-blue-400",
-    "payment-verified": "bg-brand-green-soft text-brand-green",
-    "preparing-order": "bg-primary-soft text-primary",
-    "ready-for-conference-pickup": "bg-brand-green-soft text-brand-green",
-    "ready-for-delegate-pickup": "bg-brand-green-soft text-brand-green",
-    "ready-for-delivery": "bg-brand-green-soft text-brand-green",
-    shipped: "bg-blue-500/15 text-blue-400",
-    delivered: "bg-brand-green-soft text-brand-green",
-    completed: "bg-brand-green text-white",
-    cancelled: "bg-destructive/15 text-destructive",
+    "awaiting-payment": "bg-amber-50 text-amber-700",
+    "payment-submitted": "bg-blue-50 text-blue-700",
+    "payment-verified": "bg-emerald-50 text-emerald-700",
+    "preparing-order": "bg-purple-50 text-purple-700",
+    "ready-for-conference-pickup": "bg-emerald-50 text-emerald-700",
+    "ready-for-delegate-pickup": "bg-emerald-50 text-emerald-700",
+    "ready-for-delivery": "bg-emerald-50 text-emerald-700",
+    shipped: "bg-blue-50 text-blue-700",
+    delivered: "bg-emerald-50 text-emerald-700",
+    completed: "bg-emerald-600 text-white",
+    cancelled: "bg-red-50 text-red-700",
   };
 
   return (

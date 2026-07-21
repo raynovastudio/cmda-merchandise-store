@@ -103,32 +103,7 @@
   --preorder-foreground: oklch(0.38 0.10 60);
 }
 
-.dark {
-  --background: oklch(0.13 0.015 290);
-  --foreground: oklch(0.97 0.005 85);
-  --card: oklch(0.21 0.018 290);
-  --card-foreground: oklch(0.97 0.005 85);
-  --popover: oklch(0.21 0.018 290);
-  --popover-foreground: oklch(0.97 0.005 85);
-  --primary: oklch(0.78 0.16 335);
-  --primary-foreground: oklch(0.13 0.015 290);
-  --primary-soft: oklch(0.35 0.10 335);
-  --secondary: oklch(0.26 0.015 290);
-  --secondary-foreground: oklch(0.95 0.005 85);
-  --muted: oklch(0.26 0.015 290);
-  --muted-foreground: oklch(0.88 0.01 290);
-  --accent: oklch(0.35 0.10 335);
-  --accent-foreground: oklch(0.97 0.005 85);
-  --brand-green: oklch(0.78 0.16 155);
-  --brand-green-soft: oklch(0.35 0.10 155);
-  --border: oklch(1 0 0 / 22%);
-  --input: oklch(1 0 0 / 22%);
-  --ring: oklch(0.78 0.16 335);
-  --instock: oklch(0.35 0.10 155);
-  --instock-foreground: oklch(0.90 0.10 155);
-  --preorder: oklch(0.35 0.10 80);
-  --preorder-foreground: oklch(0.92 0.12 80);
-}
+
 
 @layer base {
   * {
@@ -199,13 +174,10 @@
 .stagger > *:nth-child(5) { animation-delay: 240ms; }
 .stagger > *:nth-child(6) { animation-delay: 300ms; }
 
-/* Dark theme admin enhancements */
-.dark .rounded-2xl,
-.dark .rounded-xl {
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3),
-              0 1px 2px -1px rgba(0, 0, 0, 0.2);
+/* Admin: subtle card shadow enhancements */
+.rounded-2xl {
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
 }
-.dark .rounded-2xl:hover,
-.dark .rounded-xl:hover {
-  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.4);
+.rounded-2xl:hover {
+  box-shadow: 0 4px 12px 0 rgb(0 0 0 / 0.08);
 }

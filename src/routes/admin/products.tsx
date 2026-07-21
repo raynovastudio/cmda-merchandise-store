@@ -177,7 +177,7 @@ function AdminProducts() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-bold text-gray-900">
             Product Management
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -199,46 +199,46 @@ function AdminProducts() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products..."
-          className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
         />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
+      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border bg-secondary/40">
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+              <tr className="border-b border-gray-200 bg-gray-50">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Product
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Category
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Price
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Sizes
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-left font-medium text-gray-500">
                   Colors
                 </th>
-                <th className="px-4 py-3 text-right font-medium text-muted-foreground">
+                <th className="px-4 py-3 text-right font-medium text-gray-500">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.map((product) => (
-                <tr key={product.id} className="hover:bg-secondary/30">
+                <tr key={product.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <RowImage product={product} />
                       <div>
-                        <p className="font-medium text-foreground">
+                        <p className="font-medium text-gray-900">
                           {product.name}
                         </p>
                         <p className="max-w-[200px] truncate text-xs text-muted-foreground">
@@ -250,7 +250,7 @@ function AdminProducts() {
                   <td className="px-4 py-3 text-muted-foreground">
                     {product.category}
                   </td>
-                  <td className="px-4 py-3 font-medium text-foreground">
+                  <td className="px-4 py-3 font-medium text-gray-900">
                     {formatNaira(product.price)}
                   </td>
                   <td className="px-4 py-3">
@@ -307,9 +307,9 @@ function AdminProducts() {
 
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-xl font-bold text-foreground">
+              <h3 className="font-display text-xl font-bold text-gray-900">
                 {editingProduct ? "Edit Product" : "Add Product"}
               </h3>
               <button
@@ -330,7 +330,7 @@ function AdminProducts() {
               />
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Product Name
                 </label>
                 <input
@@ -338,14 +338,14 @@ function AdminProducts() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   placeholder="Product name"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="mb-1 block text-sm font-medium text-gray-900">
                     Price (₦)
                   </label>
                   <input
@@ -357,11 +357,11 @@ function AdminProducts() {
                         price: Number(e.target.value),
                       }))
                     }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="mb-1 block text-sm font-medium text-gray-900">
                     Category
                   </label>
                   <select
@@ -372,7 +372,7 @@ function AdminProducts() {
                         category: e.target.value as "Apparel" | "Publications",
                       }))
                     }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   >
                     <option>Apparel</option>
                     <option>Publications</option>
@@ -381,7 +381,7 @@ function AdminProducts() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Availability
                 </label>
                 <select
@@ -394,7 +394,7 @@ function AdminProducts() {
                         | "pre-order",
                     }))
                   }
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                 >
                   <option value="in-stock">In Stock</option>
                   <option value="pre-order">Pre-Order</option>
@@ -403,7 +403,7 @@ function AdminProducts() {
 
               {form.category === "Apparel" && (
                 <div>
-                  <label className="mb-2 block text-sm font-medium text-foreground">
+                  <label className="mb-2 block text-sm font-medium text-gray-900">
                     Sizes
                   </label>
                   <div className="flex flex-wrap gap-2">
@@ -414,8 +414,8 @@ function AdminProducts() {
                         onClick={() => toggleSize(s)}
                         className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-all ${
                           form.sizes.includes(s)
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border bg-background text-foreground hover:border-primary/30"
+                            ? "border-[oklch(0.38_0.15_335)] bg-[oklch(0.38_0.15_335)] text-white"
+                            : "border-gray-200 bg-white text-gray-700 hover:border-[oklch(0.38_0.15_335)]/30"
                         }`}
                       >
                         {s}
@@ -426,7 +426,7 @@ function AdminProducts() {
               )}
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-foreground">
+                <label className="mb-2 block text-sm font-medium text-gray-900">
                   <Palette className="mr-1 inline h-4 w-4" />
                   Colors
                 </label>
@@ -435,7 +435,7 @@ function AdminProducts() {
                     {form.colors.map((c) => (
                       <span
                         key={c.name}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5 text-xs font-medium"
                       >
                         <span
                           className="h-4 w-4 rounded-full border shadow-sm"
@@ -458,20 +458,20 @@ function AdminProducts() {
                     type="color"
                     value={newColorHex}
                     onChange={(e) => setNewColorHex(e.target.value)}
-                    className="h-10 w-10 cursor-pointer rounded-lg border border-border bg-background p-0.5"
+                    className="h-10 w-10 cursor-pointer rounded-lg border border-gray-200 bg-white p-0.5"
                   />
                   <input
                     value={newColorName}
                     onChange={(e) => setNewColorName(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && addColor()}
-                    className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    className="flex-1 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                     placeholder="Color name (e.g. Plum)"
                   />
                   <button
                     type="button"
                     onClick={addColor}
                     disabled={!newColorName.trim()}
-                    className="rounded-xl border border-border px-3 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-40"
+                    className="rounded-xl border border-gray-200 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40"
                   >
                     Add
                   </button>
@@ -482,7 +482,7 @@ function AdminProducts() {
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Short Description
                 </label>
                 <textarea
@@ -494,12 +494,12 @@ function AdminProducts() {
                     }))
                   }
                   rows={2}
-                  className="w-full resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Full Description
                 </label>
                 <textarea
@@ -508,14 +508,14 @@ function AdminProducts() {
                     setForm((f) => ({ ...f, description: e.target.value }))
                   }
                   rows={3}
-                  className="w-full resize-none rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                 />
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   onClick={closeModal}
-                  className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium text-foreground"
+                  className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700"
                 >
                   Cancel
                 </button>

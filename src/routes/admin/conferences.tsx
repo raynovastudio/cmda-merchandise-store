@@ -108,7 +108,7 @@ function AdminConferences() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-bold text-gray-900">
             Conference Management
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -127,11 +127,11 @@ function AdminConferences() {
         {conferences.map((conf) => (
           <div
             key={conf.id}
-            className="rounded-2xl border border-border/50 bg-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-card"
+            className="rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-card"
           >
             <div className="flex items-start justify-between">
               <div className="min-w-0 flex-1">
-                <p className="font-display text-lg font-bold text-foreground">
+                <p className="font-display text-lg font-bold text-gray-900">
                   {conf.name}
                 </p>
                 <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
@@ -157,11 +157,11 @@ function AdminConferences() {
                 className="shrink-0"
               >
                 {conf.pickupEnabled ? (
-                  <span className="inline-flex items-center gap-1 rounded-xl bg-brand-green-soft px-2.5 py-1 text-xs font-medium text-brand-green">
+                  <span className="inline-flex items-center gap-1 rounded-xl bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
                     <CheckCircle2 className="h-3 w-3" /> Active
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 rounded-xl bg-destructive/10 px-2.5 py-1 text-xs font-medium text-destructive">
+                  <span className="inline-flex items-center gap-1 rounded-xl bg-red-50 px-2.5 py-1 text-xs font-medium text-red-600">
                     <XCircle className="h-3 w-3" /> Disabled
                   </span>
                 )}
@@ -170,13 +170,13 @@ function AdminConferences() {
             <div className="mt-4 flex gap-2">
               <button
                 onClick={() => openEdit(conf)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-secondary"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50"
               >
                 <Edit className="h-3 w-3" /> Edit
               </button>
               <button
                 onClick={() => setDeleteConfirm(conf.id)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-border px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/5"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-red-50"
               >
                 <Trash2 className="h-3 w-3" /> Delete
               </button>
@@ -186,8 +186,8 @@ function AdminConferences() {
       </div>
 
       {conferences.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-border p-14 text-center">
-          <p className="font-display text-2xl font-bold text-foreground">
+        <div className="rounded-2xl border border-dashed border-gray-300 p-14 text-center">
+          <p className="font-display text-2xl font-bold text-gray-900">
             No conferences
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -199,9 +199,9 @@ function AdminConferences() {
       {/* Add/Edit Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-xl font-bold text-foreground">
+              <h3 className="font-display text-xl font-bold text-gray-900">
                 {editingConference ? "Edit Conference" : "Add Conference"}
               </h3>
               <button
@@ -213,7 +213,7 @@ function AdminConferences() {
             </div>
             <div className="mt-5 space-y-4">
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Conference Name
                 </label>
                 <input
@@ -221,12 +221,12 @@ function AdminConferences() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   placeholder="e.g. CMDA National Conference 2026"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-foreground">
+                <label className="mb-1 block text-sm font-medium text-gray-900">
                   Location
                 </label>
                 <input
@@ -234,13 +234,13 @@ function AdminConferences() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, location: e.target.value }))
                   }
-                  className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   placeholder="e.g. University of Jos, Plateau State"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="mb-1 block text-sm font-medium text-gray-900">
                     Start Date
                   </label>
                   <input
@@ -249,11 +249,11 @@ function AdminConferences() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, date: e.target.value }))
                     }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-foreground">
+                  <label className="mb-1 block text-sm font-medium text-gray-900">
                     End Date
                   </label>
                   <input
@@ -262,12 +262,12 @@ function AdminConferences() {
                     onChange={(e) =>
                       setForm((f) => ({ ...f, endDate: e.target.value }))
                     }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                   />
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <label className="text-sm font-medium text-foreground">
+                <label className="text-sm font-medium text-gray-900">
                   Pickup Enabled
                 </label>
                 <button
@@ -280,7 +280,7 @@ function AdminConferences() {
                   }
                   className={cn(
                     "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
-                    form.pickupEnabled ? "bg-brand-green" : "bg-muted",
+                    form.pickupEnabled ? "bg-emerald-500" : "bg-gray-300",
                   )}
                 >
                   <span
@@ -296,7 +296,7 @@ function AdminConferences() {
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   onClick={closeModal}
-                  className="rounded-xl border border-border px-5 py-2.5 text-sm font-medium text-foreground"
+                  className="rounded-xl border border-gray-200 px-5 py-2.5 text-sm font-medium text-gray-700"
                 >
                   Cancel
                 </button>
@@ -316,8 +316,8 @@ function AdminConferences() {
       {/* Delete Confirmation */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-2xl">
-            <h3 className="font-display text-lg font-bold text-foreground">
+          <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-6 shadow-2xl">
+            <h3 className="font-display text-lg font-bold text-gray-900">
               Delete Conference?
             </h3>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -327,7 +327,7 @@ function AdminConferences() {
             <div className="mt-5 flex justify-end gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="rounded-xl border border-border px-4 py-2 text-sm font-medium text-foreground"
+                className="rounded-xl border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700"
               >
                 Cancel
               </button>

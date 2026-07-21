@@ -155,14 +155,14 @@ function AdminOrders() {
       <div className="space-y-6">
         <button
           onClick={() => setSelectedOrder(null)}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900"
         >
           ← Back to orders
         </button>
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="font-display text-3xl font-bold text-foreground">
+            <h1 className="font-display text-3xl font-bold text-gray-900">
               {selectedOrder.orderNumber}
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
@@ -180,7 +180,7 @@ function AdminOrders() {
             <StatusBadge status={selectedOrder.status} />
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
             >
               <Printer className="h-4 w-4" /> Print
             </button>
@@ -190,8 +190,8 @@ function AdminOrders() {
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
           <div className="space-y-6">
             {/* Status controls */}
-            <div className="rounded-2xl border border-border/50 bg-card p-5">
-              <p className="font-display text-lg font-bold text-foreground">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="font-display text-lg font-bold text-gray-900">
                 Update Status
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -203,7 +203,7 @@ function AdminOrders() {
                       "rounded-xl px-3 py-1.5 text-xs font-medium transition-colors",
                       selectedOrder.status === s
                         ? "bg-primary text-primary-foreground"
-                        : "border border-border bg-card text-muted-foreground hover:text-foreground",
+                        : "border border-gray-200 bg-white text-gray-500 hover:text-gray-900",
                     )}
                   >
                     {ORDER_STATUS_LABELS[s]}
@@ -221,7 +221,7 @@ function AdminOrders() {
                         status: "payment-verified",
                       });
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-brand-green px-4 py-2 text-sm font-semibold text-white"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
                   >
                     <CheckCircle2 className="h-4 w-4" /> Approve Payment
                   </button>
@@ -233,7 +233,7 @@ function AdminOrders() {
                         status: "cancelled",
                       });
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-destructive/15 px-4 py-2 text-sm font-semibold text-destructive"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600"
                   >
                     <XCircle className="h-4 w-4" /> Reject Payment
                   </button>
@@ -242,16 +242,16 @@ function AdminOrders() {
             </div>
 
             {/* Timeline */}
-            <div className="rounded-2xl border border-border/50 bg-card p-5">
-              <p className="font-display text-lg font-bold text-foreground">Timeline</p>
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="font-display text-lg font-bold text-gray-900">Timeline</p>
               <div className="mt-4">
                 <OrderTimeline order={selectedOrder} />
               </div>
             </div>
 
             {/* Items */}
-            <div className="rounded-2xl border border-border/50 bg-card p-5">
-              <p className="font-display text-lg font-bold text-foreground">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="font-display text-lg font-bold text-gray-900">
                 Items Ordered
               </p>
               <ul className="mt-3 space-y-3">
@@ -263,7 +263,7 @@ function AdminOrders() {
                       className="h-10 w-10 rounded-lg object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium text-foreground">
+                      <p className="truncate font-medium text-gray-900">
                         {item.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
@@ -273,32 +273,32 @@ function AdminOrders() {
                         × {item.quantity}
                       </p>
                     </div>
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium text-gray-900">
                       {formatNaira(item.price * item.quantity)}
                     </p>
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 space-y-2 border-t border-border pt-4 text-sm">
+              <div className="mt-4 space-y-2 border-t border-gray-200 pt-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span className="font-medium text-foreground">
+                  <span className="font-medium text-gray-900">
                     {formatNaira(selectedOrder.subtotal)}
                   </span>
                 </div>
                 {selectedOrder.deliveryFee > 0 && (
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Delivery Fee</span>
-                    <span className="font-medium text-foreground">
+                    <span className="font-medium text-gray-900">
                       {formatNaira(selectedOrder.deliveryFee)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between border-t border-border pt-2">
-                  <span className="font-display text-foreground">
+                <div className="flex justify-between border-t border-gray-200 pt-2">
+                  <span className="font-display text-gray-900">
                     Grand Total
                   </span>
-                  <span className="font-display text-foreground">
+                  <span className="font-display text-gray-900">
                     {formatNaira(selectedOrder.grandTotal)}
                   </span>
                 </div>
@@ -308,12 +308,12 @@ function AdminOrders() {
 
           <div className="space-y-4">
             {/* Customer */}
-            <div className="rounded-2xl border border-border/50 bg-card p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-500">
                 Customer
               </p>
               <div className="mt-2 space-y-1 text-sm">
-                <p className="font-medium text-foreground">
+                <p className="font-medium text-gray-900">
                   {selectedOrder.customerName}
                 </p>
                 <p className="text-muted-foreground">
@@ -331,12 +331,12 @@ function AdminOrders() {
             </div>
 
             {/* Fulfillment */}
-            <div className="rounded-2xl border border-border/50 bg-card p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+            <div className="rounded-2xl border border-gray-200 bg-white p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-500">
                 Fulfillment
               </p>
               <div className="mt-2 text-sm">
-                <p className="font-medium capitalize text-foreground">
+                <p className="font-medium capitalize text-gray-900">
                   {selectedOrder.fulfillmentMethod.replace(/-/g, " ")}
                 </p>
                 {selectedOrder.conferencePickup && (
@@ -346,7 +346,7 @@ function AdminOrders() {
                 )}
                 {selectedOrder.delegatePickup && (
                   <div className="mt-2 space-y-1 text-muted-foreground">
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium text-gray-900">
                       {selectedOrder.delegatePickup.fullName}
                     </p>
                     <p>{selectedOrder.delegatePickup.phone}</p>
@@ -382,12 +382,12 @@ function AdminOrders() {
 
             {/* Pickup code */}
             {selectedOrder.pickupCode && (
-              <div className="rounded-2xl border border-border/50 bg-card p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-500">
                   Pickup Code
                 </p>
                 <div className="mt-2 flex items-center gap-3">
-                  <p className="font-display text-3xl font-bold tracking-wider text-foreground">
+                  <p className="font-display text-3xl font-bold tracking-wider text-gray-900">
                     {selectedOrder.pickupCode}
                   </p>
                   <button
@@ -398,7 +398,7 @@ function AdminOrders() {
                   </button>
                 </div>
                 {selectedOrder.pickupVerified && (
-                  <p className="mt-2 text-xs text-brand-green">
+                  <p className="mt-2 text-xs text-emerald-600">
                     ✓ Pickup verified
                   </p>
                 )}
@@ -407,8 +407,8 @@ function AdminOrders() {
 
             {/* Payment proof */}
             {selectedOrder.paymentProof && (
-              <div className="rounded-2xl border border-border/50 bg-card p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-gray-500">
                   Payment Proof
                 </p>
                 <div className="mt-2 space-y-1 text-sm text-muted-foreground">
@@ -429,7 +429,7 @@ function AdminOrders() {
                     <img
                       src={selectedOrder.paymentProof.fileDataUrl}
                       alt="Payment proof"
-                      className="mt-3 max-h-48 rounded-xl border border-border object-contain"
+                      className="mt-3 max-h-48 rounded-xl border border-gray-200 object-contain"
                     />
                   )}
               </div>
@@ -440,11 +440,11 @@ function AdminOrders() {
         {/* QR Modal */}
         {showQR && selectedOrder.pickupCode && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="rounded-2xl border border-border bg-card p-8 text-center shadow-2xl">
-              <p className="font-display text-xl font-bold text-foreground">
+            <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-2xl">
+              <p className="font-display text-xl font-bold text-gray-900">
                 Pickup Code
               </p>
-              <p className="mt-4 font-display text-5xl tracking-wider text-foreground">
+              <p className="mt-4 font-display text-5xl tracking-wider text-gray-900">
                 {selectedOrder.pickupCode}
               </p>
               <p className="mt-2 text-sm text-muted-foreground">
@@ -472,7 +472,7 @@ function AdminOrders() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-bold text-foreground">
+          <h1 className="font-display text-3xl font-bold text-gray-900">
             Order Management
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -481,7 +481,7 @@ function AdminOrders() {
         </div>
         <button
           onClick={exportCSV}
-          className="inline-flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground"
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
@@ -494,12 +494,12 @@ function AdminOrders() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by order #, name, phone, or email..."
-          className="w-full rounded-xl border border-border bg-card py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
         />
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 overflow-x-auto rounded-xl border border-border bg-background p-1">
+      <div className="flex gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-gray-100 p-1">
         {filterTabs.map((tab) => (
           <button
             key={tab.key}
@@ -507,8 +507,8 @@ function AdminOrders() {
             className={cn(
               "whitespace-nowrap rounded-lg px-3 py-2 text-xs font-medium transition-colors",
               filterTab === tab.key
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-white text-gray-900 shadow-sm"
+                : "text-gray-500 hover:text-gray-900",
             )}
           >
             {tab.label} ({tab.count})
@@ -518,8 +518,8 @@ function AdminOrders() {
 
       {/* Orders list */}
       {filtered.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-border p-12 text-center">
-          <p className="font-display text-2xl font-bold text-foreground">
+        <div className="rounded-3xl border border-dashed border-gray-300 p-12 text-center">
+          <p className="font-display text-2xl font-bold text-gray-900">
             No orders found
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
@@ -532,12 +532,12 @@ function AdminOrders() {
             <button
               key={order.id}
               onClick={() => setSelectedOrder(order)}
-              className="w-full rounded-2xl border border-border/50 bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-card"
+              className="w-full rounded-2xl border border-gray-200 bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-card"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-display text-lg font-bold text-foreground">
+                    <p className="font-display text-lg font-bold text-gray-900">
                       {order.orderNumber}
                     </p>
                     <StatusBadge status={order.status} />
@@ -554,7 +554,7 @@ function AdminOrders() {
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-right">
-                    <p className="font-display text-lg font-bold text-foreground">
+                    <p className="font-display text-lg font-bold text-gray-900">
                       {formatNaira(order.grandTotal)}
                     </p>
                     <p className="text-xs text-muted-foreground">

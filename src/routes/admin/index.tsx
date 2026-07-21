@@ -60,14 +60,14 @@ function AdminDashboard() {
       label: "Products",
       value: `${inStockProducts}/${totalProducts} in stock`,
       icon: Package,
-      color: "bg-secondary text-foreground",
+      color: "bg-gray-100 text-gray-700",
     },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-foreground">
+        <h1 className="font-display text-3xl font-bold text-gray-900">
           Dashboard Overview
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -81,7 +81,7 @@ function AdminDashboard() {
           return (
             <div
               key={stat.label}
-              className="rounded-2xl border border-border/50 bg-card p-5"
+              className="rounded-2xl border border-gray-200 bg-white p-5"
             >
               <div className="flex items-start justify-between">
                 <div
@@ -90,7 +90,7 @@ function AdminDashboard() {
                   <Icon className="h-5 w-5" />
                 </div>
               </div>
-              <p className="mt-3 font-display text-2xl font-bold text-foreground">
+              <p className="mt-3 font-display text-2xl font-bold text-gray-900">
                 {stat.value}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">{stat.label}</p>
@@ -100,9 +100,9 @@ function AdminDashboard() {
       </div>
 
       {/* Recent orders */}
-      <div className="rounded-2xl border border-border/50 bg-card">
-        <div className="border-b border-border px-6 py-4">
-          <p className="font-display text-lg font-bold text-foreground">Recent Orders</p>
+      <div className="rounded-2xl border border-gray-200 bg-white">
+        <div className="border-b border-gray-200 px-6 py-4">
+          <p className="font-display text-lg font-bold text-gray-900">Recent Orders</p>
         </div>
         {orders.length === 0 ? (
           <div className="px-6 py-12 text-center">
@@ -125,7 +125,7 @@ function AdminDashboard() {
                     <Users className="h-4 w-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-foreground">
+                    <p className="truncate text-sm font-medium text-gray-900">
                       {order.orderNumber} — {order.customerName}
                     </p>
                     <p className="text-xs text-muted-foreground">
@@ -137,7 +137,7 @@ function AdminDashboard() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-foreground">
+                    <p className="font-medium text-gray-900">
                       {formatNaira(order.grandTotal)}
                     </p>
                     <p className="text-xs capitalize text-muted-foreground">
