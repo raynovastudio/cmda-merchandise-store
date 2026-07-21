@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { ShoppingBag, Menu, X, User, Shield } from "lucide-react";
+import { ShoppingBag, Menu, X, User } from "lucide-react";
 import { useState } from "react";
 import { LogoFull, LogoMark } from "./Logo";
 import { useCartCount } from "@/stores/cart";
@@ -46,13 +46,6 @@ export function Header() {
           >
             <User className="h-4 w-4" />
             <span>Orders</span>
-          </Link>
-          <Link
-            to="/admin"
-            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground sm:inline-flex"
-          >
-            <Shield className="h-4 w-4" />
-            <span>Admin</span>
           </Link>
           <div className="mx-1 hidden h-5 w-px bg-border sm:block" />
           <Link
@@ -107,13 +100,6 @@ export function Header() {
             className="rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
           >
             My Orders
-          </Link>
-          <Link
-            to="/admin"
-            onClick={() => setOpen(false)}
-            className="rounded-xl px-3.5 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
-          >
-            Admin
           </Link>
         </nav>
       </div>

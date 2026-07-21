@@ -51,6 +51,7 @@ function AdminProducts() {
     customProducts,
     updatedProducts,
     setProductImage,
+    removeProductImage,
     addProduct,
     updateProduct,
     deleteProduct,
@@ -80,9 +81,8 @@ function AdminProducts() {
       description: product.description,
       sizes: product.sizes ?? [],
       colors: product.colors ?? [],
-      image: customImg,
+      image: customImg || product.image,
     });
-    setShowAddModal(true);
   };
 
   const closeModal = () => {
@@ -96,6 +96,8 @@ function AdminProducts() {
     if (editingProduct) {
       if (form.image) {
         setProductImage(editingProduct.id, form.image);
+      } else if (customImages[editingProduct.id]) {
+        removeProductImage(editingProduct.id);
       }
       updateProduct(editingProduct.id, {
         name: form.name,
