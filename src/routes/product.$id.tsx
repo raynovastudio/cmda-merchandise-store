@@ -4,7 +4,7 @@ import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { ProductCard } from "@/components/site/ProductCard";
-import { formatNaira, getProduct } from "@/data/products";
+import { formatNaira, getProduct, type ProductColor } from "@/data/products";
 import { useCart } from "@/stores/cart";
 import { cn } from "@/lib/utils";
 import { getProductImage, getAllProducts, resolveProduct } from "@/stores/adminProducts";
@@ -82,17 +82,21 @@ function ProductPage() {
   const { product } = Route.useLoaderData();
   const add = useCart((s) => s.add);
   const [size, setSize] = useState<string | null>(product.sizes ? "" : null);
+  const [color, setColor] = useState<string | null>(
+    product.colors ? "" : null,
+  );
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   const needsSize = !!product.sizes;
-  const canAdd = !needsSize || !!size;
+  const needsColor = !!product.colors;
+  const canAdd = (!needsSize || !!size) && (!needsColor || !!color);
 
   const related = getAllProducts().filter((p) => p.id !== product.id).slice(0, 3);
 
   const handleAdd = () => {
     if (!canAdd) return;
-    add(product.id, size, qty);
+    add(product.id, size, qty, color);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
   };
@@ -163,6 +167,40 @@ function ProductPage() {
             </div>
           )}
 
+          {needsColor && (
+            <div className="mt-8">
+              <div className="mb-2.5 flex items-center justify-between">
+                <p className="text-sm font-semibold text-foreground">Color</p>
+                {color && (
+                  <p className="text-xs text-muted-foreground">Selected: {color}</p>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {product.colors!.map((c: ProductColor) => (
+                  <button
+                    key={c.name}
+                    onClick={() => setColor(c.name)}
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm font-medium transition-all",
+                      color === c.name
+                        ? "border-primary bg-primary/5 text-foreground shadow-sm ring-1 ring-primary/20"
+                        : "border-border bg-card text-foreground hover:border-primary/30 hover:bg-primary/5",
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "h-5 w-5 rounded-full border-2 shadow-sm",
+                        c.hex === "#FFFFFF" ? "border-gray-300" : "border-transparent",
+                      )}
+                      style={{ backgroundColor: c.hex }}
+                    />
+                    {c.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="mt-8">
             <p className="mb-2.5 text-sm font-semibold text-foreground">Quantity</p>
             <div className="inline-flex items-center rounded-xl border border-border bg-card shadow-card">
@@ -213,9 +251,12 @@ function ProductPage() {
             </Link>
           </div>
 
-          {needsSize && !size && (
+          {(!canAdd) && (
             <p className="mt-3 text-xs text-muted-foreground">
-              Select a size to add this product to your cart.
+              {!needsSize && needsColor && !color && "Select a color to add this product to your cart."}
+              {needsSize && !size && !needsColor && "Select a size to add this product to your cart."}
+              {needsSize && !size && needsColor && !color && "Select a size and color to add this product to your cart."}
+              {needsSize && size && needsColor && !color && "Select a color to add this product to your cart."}
             </p>
           )}
 

@@ -236,6 +236,7 @@ function CheckoutPage() {
           name: p.name,
           price: p.price,
           size: item.size,
+          color: item.color,
           quantity: item.quantity,
           image: getProductImage(p.id, p.image),
         };
@@ -1010,8 +1011,10 @@ function CheckoutPage() {
                         {p.name}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {item.size ? `Size: ${item.size}` : "One size"} ×{" "}
-                        {item.quantity}
+                        {[item.size && `Size: ${item.size}`, item.color && `Color: ${item.color}`]
+                          .filter(Boolean)
+                          .join(" · ") || "One size"}{" "}
+                        × {item.quantity}
                       </p>
                     </div>
                     <p className="font-semibold text-foreground">

@@ -96,6 +96,7 @@ function CartPage() {
                           </Link>
                           <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             {item.size && <span>Size: {item.size}</span>}
+                            {item.color && <span>Color: {item.color}</span>}
                             <AvailabilityBadge availability={p.availability} />
                           </div>
                         </div>

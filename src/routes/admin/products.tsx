@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Edit, Search, Trash2 } from "lucide-react";
+import { Plus, Edit, Search, Trash2, Palette, X } from "lucide-react";
 import { useMemo, useState } from "react";
-import { formatNaira, type Product } from "@/data/products";
+import { formatNaira, type Product, type ProductColor } from "@/data/products";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import {
@@ -24,6 +24,7 @@ type FormState = {
   shortDescription: string;
   description: string;
   sizes: string[];
+  colors: ProductColor[];
   image: string;
 };
 
@@ -35,6 +36,7 @@ const emptyForm: FormState = {
   shortDescription: "",
   description: "",
   sizes: [],
+  colors: [],
   image: "",
 };
 
@@ -81,6 +83,7 @@ function AdminProducts() {
       shortDescription: product.shortDescription,
       description: product.description,
       sizes: product.sizes ?? [],
+      colors: product.colors ?? [],
       image: customImg,
     });
     setShowAddModal(true);
@@ -106,6 +109,7 @@ function AdminProducts() {
         shortDescription: form.shortDescription,
         description: form.description,
         sizes: form.sizes.length > 0 ? form.sizes : null,
+        colors: form.colors.length > 0 ? form.colors : null,
       });
     } else {
       const id = form.name
@@ -121,6 +125,7 @@ function AdminProducts() {
         shortDescription: form.shortDescription,
         description: form.description,
         sizes: form.sizes.length > 0 ? form.sizes : null,
+        colors: form.colors.length > 0 ? form.colors : null,
         availability: form.availability,
       };
       addProduct(newProduct);
@@ -137,6 +142,26 @@ function AdminProducts() {
       sizes: f.sizes.includes(s)
         ? f.sizes.filter((x) => x !== s)
         : [...f.sizes, s],
+    }));
+  };
+
+  const [newColorName, setNewColorName] = useState("");
+  const [newColorHex, setNewColorHex] = useState("#8B2C6B");
+
+  const addColor = () => {
+    if (!newColorName.trim()) return;
+    if (form.colors.some((c) => c.name.toLowerCase() === newColorName.toLowerCase())) return;
+    setForm((f) => ({
+      ...f,
+      colors: [...f.colors, { name: newColorName.trim(), hex: newColorHex }],
+    }));
+    setNewColorName("");
+  };
+
+  const removeColor = (name: string) => {
+    setForm((f) => ({
+      ...f,
+      colors: f.colors.filter((c) => c.name !== name),
     }));
   };
 
@@ -190,6 +215,9 @@ function AdminProducts() {
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Sizes
                 </th>
+                <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                  Colors
+                </th>
                 <th className="px-4 py-3 text-right font-medium text-muted-foreground">
                   Actions
                 </th>
@@ -226,6 +254,22 @@ function AdminProducts() {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {product.sizes ? product.sizes.join(", ") : "One Size"}
+                  </td>
+                  <td className="px-4 py-3">
+                    {product.colors && product.colors.length > 0 ? (
+                      <div className="flex gap-1">
+                        {product.colors.map((c) => (
+                          <span
+                            key={c.name}
+                            title={c.name}
+                            className="h-5 w-5 rounded-full border-2 border-background shadow-sm"
+                            style={{ backgroundColor: c.hex }}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-muted-foreground">None</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
@@ -375,6 +419,62 @@ function AdminProducts() {
                   </div>
                 </div>
               )}
+
+              <div>
+                <label className="mb-2 block text-sm font-medium text-foreground">
+                  <Palette className="mr-1 inline h-4 w-4" />
+                  Colors
+                </label>
+                {form.colors.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {form.colors.map((c) => (
+                      <span
+                        key={c.name}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-medium"
+                      >
+                        <span
+                          className="h-4 w-4 rounded-full border shadow-sm"
+                          style={{ backgroundColor: c.hex }}
+                        />
+                        {c.name}
+                        <button
+                          type="button"
+                          onClick={() => removeColor(c.name)}
+                          className="ml-0.5 rounded-full p-0.5 text-muted-foreground hover:text-red-500"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <input
+                    type="color"
+                    value={newColorHex}
+                    onChange={(e) => setNewColorHex(e.target.value)}
+                    className="h-10 w-10 cursor-pointer rounded-lg border border-border bg-background p-0.5"
+                  />
+                  <input
+                    value={newColorName}
+                    onChange={(e) => setNewColorName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && addColor()}
+                    className="flex-1 rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:border-primary focus:outline-none"
+                    placeholder="Color name (e.g. Plum)"
+                  />
+                  <button
+                    type="button"
+                    onClick={addColor}
+                    disabled={!newColorName.trim()}
+                    className="rounded-xl border border-border px-3 text-sm font-medium text-foreground hover:bg-secondary disabled:opacity-40"
+                  >
+                    Add
+                  </button>
+                </div>
+                <p className="mt-1.5 text-xs text-muted-foreground">
+                  Pick a hex color and name it. Customers will see color swatches.
+                </p>
+              </div>
 
               <div>
                 <label className="mb-1 block text-sm font-medium text-foreground">

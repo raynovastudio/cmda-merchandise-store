@@ -3,30 +3,39 @@ import { persist } from "zustand/middleware";
 import { resolveProduct } from "@/stores/adminProducts";
 
 export type CartItem = {
-  key: string; // productId + size
+  key: string;
   productId: string;
   size: string | null;
+  color: string | null;
   quantity: number;
 };
 
 type CartState = {
   items: CartItem[];
-  add: (productId: string, size: string | null, quantity?: number) => void;
+  add: (
+    productId: string,
+    size: string | null,
+    quantity?: number,
+    color?: string | null,
+  ) => void;
   updateQuantity: (key: string, quantity: number) => void;
   remove: (key: string) => void;
   clear: () => void;
 };
 
-const makeKey = (productId: string, size: string | null) =>
-  `${productId}::${size ?? "one"}`;
+const makeKey = (
+  productId: string,
+  size: string | null,
+  color: string | null,
+) => `${productId}::${size ?? "one"}::${color ?? "none"}`;
 
 export const useCart = create<CartState>()(
   persist(
     (set) => ({
       items: [],
-      add: (productId, size, quantity = 1) =>
+      add: (productId, size, quantity = 1, color = null) =>
         set((state) => {
-          const key = makeKey(productId, size);
+          const key = makeKey(productId, size, color);
           const existing = state.items.find((i) => i.key === key);
           if (existing) {
             return {
@@ -35,7 +44,9 @@ export const useCart = create<CartState>()(
               ),
             };
           }
-          return { items: [...state.items, { key, productId, size, quantity }] };
+          return {
+            items: [...state.items, { key, productId, size, color, quantity }],
+          };
         }),
       updateQuantity: (key, quantity) =>
         set((state) => ({
