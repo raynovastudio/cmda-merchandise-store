@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
-import { getAllProducts } from "@/stores/adminProducts";
+import { useProducts } from "@/stores/adminProducts";
 import { cn } from "@/lib/utils";
 
 const searchSchema = z.object({
@@ -47,15 +47,17 @@ function ShopPage() {
   const activeCategory = search.category ?? "All";
   const activeAvailability = search.availability ?? "all";
 
+  const allProducts = useProducts();
+
   const filtered = useMemo(() => {
-    return getAllProducts().filter((p) => {
+    return allProducts.filter((p) => {
       if (activeCategory !== "All" && p.category !== activeCategory) return false;
       if (activeAvailability !== "all" && p.availability !== activeAvailability)
         return false;
       if (q && !p.name.toLowerCase().includes(q.toLowerCase())) return false;
       return true;
     });
-  }, [activeCategory, activeAvailability, q]);
+  }, [allProducts, activeCategory, activeAvailability, q]);
 
   return (
     <SiteLayout>

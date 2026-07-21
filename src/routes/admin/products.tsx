@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Plus, Edit, Search, Trash2, Palette, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { formatNaira, type Product, type ProductColor } from "@/data/products";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import {
   useAdminProducts,
+  useProducts,
   getProductImage,
-  getAllProducts,
 } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/admin/products")({
@@ -56,11 +56,7 @@ function AdminProducts() {
     deleteProduct,
   } = useAdminProducts();
 
-  const allProducts = useMemo(
-    () => getAllProducts(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [customImages, customProducts, updatedProducts],
-  );
+  const allProducts = useProducts();
 
   const filtered = allProducts.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),

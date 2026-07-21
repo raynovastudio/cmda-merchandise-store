@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useMemo } from "react";
 import { products as baseProducts, type Product } from "@/data/products";
 
 type AdminProductsState = {
@@ -60,6 +61,31 @@ export const useAdminProducts = create<AdminProductsState>()(
   ),
 );
 
+function computeProducts(
+  customProducts: Product[],
+  updatedProducts: Record<string, Partial<Product>>,
+): Product[] {
+  const base: Product[] = [...baseProducts, ...customProducts];
+  return base.map((p) => {
+    const updates = updatedProducts[p.id];
+    return updates ? { ...p, ...updates } : p;
+  });
+}
+
+export function useProducts(): Product[] {
+  const customProducts = useAdminProducts((s) => s.customProducts);
+  const updatedProducts = useAdminProducts((s) => s.updatedProducts);
+  return useMemo(
+    () => computeProducts(customProducts, updatedProducts),
+    [customProducts, updatedProducts],
+  );
+}
+
+export function useProductImage(productId: string, fallbackImage: string): string {
+  const customImages = useAdminProducts((s) => s.customImages);
+  return customImages[productId] ?? fallbackImage;
+}
+
 export function getProductImage(
   productId: string,
   fallbackImage: string,
@@ -70,11 +96,7 @@ export function getProductImage(
 
 export function getAllProducts(): Product[] {
   const { customProducts, updatedProducts } = useAdminProducts.getState();
-  const base: Product[] = [...baseProducts, ...customProducts];
-  return base.map((p) => {
-    const updates = updatedProducts[p.id];
-    return updates ? { ...p, ...updates } : p;
-  });
+  return computeProducts(customProducts, updatedProducts);
 }
 
 export function resolveProduct(id: string): Product | undefined {

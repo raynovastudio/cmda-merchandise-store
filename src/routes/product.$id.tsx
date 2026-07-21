@@ -7,7 +7,7 @@ import { ProductCard } from "@/components/site/ProductCard";
 import { formatNaira, getProduct, type ProductColor } from "@/data/products";
 import { useCart } from "@/stores/cart";
 import { cn } from "@/lib/utils";
-import { getProductImage, getAllProducts, resolveProduct } from "@/stores/adminProducts";
+import { useProducts, getProductImage, resolveProduct } from "@/stores/adminProducts";
 import { ImagePlaceholder } from "@/components/admin/ImagePlaceholder";
 
 export const Route = createFileRoute("/product/$id")({
@@ -93,7 +93,8 @@ function ProductPage() {
   const needsColor = !!product.colors;
   const canAdd = (!needsSize || !!size) && (!needsColor || !!color);
 
-  const related = getAllProducts().filter((p) => p.id !== product.id).slice(0, 3);
+  const allProducts = useProducts();
+  const related = allProducts.filter((p) => p.id !== product.id).slice(0, 3);
 
   const handleAdd = () => {
     if (!canAdd) return;

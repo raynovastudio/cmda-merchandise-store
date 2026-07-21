@@ -2,14 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Package, Sparkles, Truck, HandHeart } from "lucide-react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { ProductCard } from "@/components/site/ProductCard";
-import { getAllProducts } from "@/stores/adminProducts";
+import { useProducts } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/")({
   component: Index,
 });
 
 function Index() {
-  const allProducts = getAllProducts();
+  const allProducts = useProducts();
   const featured = allProducts.filter((p) => p.featured);
 
   return (
