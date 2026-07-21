@@ -26,12 +26,12 @@ export function Footer() {
         </div>
         <div>
           <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-background/40">
-            Secretariat
+            National Office
           </p>
           <ul className="space-y-2.5 text-sm text-background/70">
-            <li>National Secretariat, Abuja</li>
-            <li>secretariat@cmdanigeria.org</li>
-            <li>+234 (0) 000 0000 000</li>
+            <li>Wholeness House Gwagwalada, FCT.</li>
+            <li>office@cmdanigeria.org</li>
+            <li>+234 (809) 153 3339</li>
           </ul>
         </div>
       </div>
