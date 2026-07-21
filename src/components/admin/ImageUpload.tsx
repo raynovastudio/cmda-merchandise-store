@@ -1,23 +1,31 @@
 import { useCallback, useRef, useState } from "react";
-import { Upload, X, ImageIcon } from "lucide-react";
+import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { uploadProductImage } from "@/lib/imageStorage";
 
 type ImageUploadProps = {
   value: string;
-  onChange: (dataUrl: string) => void;
+  onChange: (url: string) => void;
+  productId?: string;
   className?: string;
 };
 
 const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 const MAX_SIZE = 5 * 1024 * 1024;
 
-export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
+export function ImageUpload({
+  value,
+  onChange,
+  productId,
+  className,
+}: ImageUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const processFile = useCallback(
-    (file: File) => {
+    async (file: File) => {
       setError(null);
       if (!ACCEPTED.includes(file.type)) {
         setError("Only JPG, PNG, WebP, and GIF images are accepted.");
@@ -27,13 +35,28 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
         setError("Image must be under 5 MB.");
         return;
       }
-      const reader = new FileReader();
-      reader.onload = () => {
-        onChange(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+
+      if (productId) {
+        setUploading(true);
+        try {
+          const url = await uploadProductImage(file, productId);
+          onChange(url);
+        } catch (e: unknown) {
+          const msg =
+            e instanceof Error ? e.message : "Upload failed. Try again.";
+          setError(msg);
+        } finally {
+          setUploading(false);
+        }
+      } else {
+        const reader = new FileReader();
+        reader.onload = () => {
+          onChange(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      }
     },
-    [onChange],
+    [onChange, productId],
   );
 
   const handleDrop = useCallback(
@@ -73,19 +96,26 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
             alt="Product preview"
             className="h-48 w-full object-cover"
           />
+          {uploading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+              <Loader2 className="h-6 w-6 animate-spin text-white" />
+            </div>
+          )}
           <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
             <div className="flex gap-2">
               <button
                 type="button"
                 onClick={() => inputRef.current?.click()}
-                className="rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-white"
+                disabled={uploading}
+                className="rounded-lg bg-white/90 px-3 py-1.5 text-xs font-semibold text-foreground transition-colors hover:bg-white disabled:opacity-50"
               >
                 Change
               </button>
               <button
                 type="button"
                 onClick={() => onChange("")}
-                className="rounded-lg bg-red-500/90 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-500"
+                disabled={uploading}
+                className="rounded-lg bg-red-500/90 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-red-500 disabled:opacity-50"
               >
                 Remove
               </button>
@@ -97,16 +127,19 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
-          onClick={() => inputRef.current?.click()}
+          onClick={() => !uploading && inputRef.current?.click()}
           className={cn(
             "flex h-48 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors",
             dragging
               ? "border-primary bg-primary/5"
               : "border-border hover:border-primary/40 hover:bg-secondary/30",
+            uploading && "pointer-events-none opacity-60",
           )}
         >
           <div className="grid h-12 w-12 place-items-center rounded-full bg-secondary">
-            {dragging ? (
+            {uploading ? (
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            ) : dragging ? (
               <ImageIcon className="h-5 w-5 text-primary" />
             ) : (
               <Upload className="h-5 w-5 text-muted-foreground" />
@@ -114,7 +147,11 @@ export function ImageUpload({ value, onChange, className }: ImageUploadProps) {
           </div>
           <div className="text-center">
             <p className="text-sm font-medium text-foreground">
-              {dragging ? "Drop image here" : "Click or drag to upload"}
+              {uploading
+                ? "Uploading..."
+                : dragging
+                  ? "Drop image here"
+                  : "Click or drag to upload"}
             </p>
             <p className="mt-0.5 text-xs text-muted-foreground">
               JPG, PNG, WebP — up to 5 MB

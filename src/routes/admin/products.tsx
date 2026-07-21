@@ -56,6 +56,7 @@ function AdminProducts() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
+  const [formProductId, setFormProductId] = useState("");
 
   const {
     customImages,
@@ -76,6 +77,7 @@ function AdminProducts() {
 
   const openAdd = () => {
     setEditingProduct(null);
+    setFormProductId(`custom-${Date.now()}`);
     setForm({ ...emptyForm, image: "" });
     setShowAddModal(true);
   };
@@ -101,7 +103,7 @@ function AdminProducts() {
     setEditingProduct(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.price) return;
 
     if (editingProduct) {
@@ -121,12 +123,8 @@ function AdminProducts() {
         colors: form.colors.length > 0 ? form.colors : null,
       });
     } else {
-      const id = form.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
       const newProduct: Product = {
-        id: `custom-${id}-${Date.now()}`,
+        id: formProductId,
         name: form.name,
         price: form.price,
         category: form.category,
@@ -324,9 +322,10 @@ function AdminProducts() {
             <div className="mt-5 space-y-5">
               <ImageUpload
                 value={form.image}
-                onChange={(dataUrl) =>
-                  setForm((f) => ({ ...f, image: dataUrl }))
+                onChange={(url) =>
+                  setForm((f) => ({ ...f, image: url }))
                 }
+                productId={editingProduct?.id ?? formProductId}
               />
 
               <div>
