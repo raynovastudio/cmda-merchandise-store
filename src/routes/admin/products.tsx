@@ -59,9 +59,7 @@ function AdminProducts() {
   const [formProductId, setFormProductId] = useState("");
 
   const {
-    customImages,
-    customProducts,
-    updatedProducts,
+    remoteProducts,
     setProductImage,
     removeProductImage,
     addProduct,
@@ -84,7 +82,7 @@ function AdminProducts() {
 
   const openEdit = (product: Product) => {
     setEditingProduct(product);
-    const customImg = customImages[product.id] ?? "";
+    const remoteImg = remoteProducts[product.id]?.image ?? "";
     setForm({
       name: product.name,
       price: product.price,
@@ -94,7 +92,7 @@ function AdminProducts() {
       description: product.description,
       sizes: product.sizes ?? [],
       colors: product.colors ?? [],
-      image: customImg || product.image,
+      image: remoteImg || product.image,
     });
     setShowAddModal(true);
   };
@@ -109,11 +107,11 @@ function AdminProducts() {
 
     if (editingProduct) {
       if (form.image) {
-        setProductImage(editingProduct.id, form.image);
-      } else if (customImages[editingProduct.id]) {
-        removeProductImage(editingProduct.id);
+        await setProductImage(editingProduct.id, form.image);
+      } else if (remoteProducts[editingProduct.id]?.image) {
+        await removeProductImage(editingProduct.id);
       }
-      updateProduct(editingProduct.id, {
+      await updateProduct(editingProduct.id, {
         name: form.name,
         price: form.price,
         category: form.category,
@@ -136,9 +134,9 @@ function AdminProducts() {
         colors: form.colors.length > 0 ? form.colors : null,
         availability: form.availability,
       };
-      addProduct(newProduct);
+      await addProduct(newProduct);
       if (form.image) {
-        setProductImage(newProduct.id, form.image);
+        await setProductImage(newProduct.id, form.image);
       }
     }
     closeModal();

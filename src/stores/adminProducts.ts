@@ -1,102 +1,233 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { useMemo } from "react";
-import { products as baseProducts, type Product } from "@/data/products";
+import { useMemo, useEffect } from "react";
+import { products as baseProducts, type Product, type ProductColor, type Availability } from "@/data/products";
+import { supabase } from "@/lib/supabase";
 
-type AdminProductsState = {
-  customImages: Record<string, string>;
-  customProducts: Product[];
-  updatedProducts: Record<string, Partial<Product>>;
-
-  setProductImage: (productId: string, dataUrl: string) => void;
-  removeProductImage: (productId: string) => void;
-
-  addProduct: (product: Product) => void;
-  updateProduct: (productId: string, updates: Partial<Product>) => void;
-  deleteProduct: (productId: string) => void;
+type ProductRow = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  image: string;
+  short_description: string;
+  description: string;
+  sizes: string[] | null;
+  colors: ProductColor[] | null;
+  availability: string;
+  is_custom: boolean;
+  created_at: string;
 };
 
-export const useAdminProducts = create<AdminProductsState>()(
-  persist(
-    (set) => ({
-      customImages: {},
-      customProducts: [],
-      updatedProducts: {},
+function rowToProduct(row: ProductRow): Product {
+  return {
+    id: row.id,
+    name: row.name,
+    category: row.category as "Apparel" | "Publications",
+    price: row.price,
+    image: row.image ?? "",
+    shortDescription: row.short_description ?? "",
+    description: row.description ?? "",
+    sizes: row.sizes ?? null,
+    colors: row.colors ?? null,
+    availability: (row.availability as Availability) ?? "in-stock",
+  };
+}
 
-      setProductImage: (productId, dataUrl) =>
-        set((state) => ({
-          customImages: { ...state.customImages, [productId]: dataUrl },
-        })),
+function productToRow(product: Product, isCustom: boolean): Omit<ProductRow, "created_at"> {
+  return {
+    id: product.id,
+    name: product.name,
+    category: product.category,
+    price: product.price,
+    image: product.image ?? "",
+    short_description: product.shortDescription ?? "",
+    description: product.description ?? "",
+    sizes: product.sizes ?? null,
+    colors: product.colors ?? null,
+    availability: product.availability,
+    is_custom: isCustom,
+  };
+}
 
-      removeProductImage: (productId) =>
-        set((state) => {
-          const { [productId]: _, ...rest } = state.customImages;
-          return { customImages: rest };
-        }),
+type AdminProductsState = {
+  remoteProducts: Record<string, Product>;
+  loaded: boolean;
+  loading: boolean;
 
-      addProduct: (product) =>
-        set((state) => ({
-          customProducts: [...state.customProducts, product],
-        })),
+  loadFromSupabase: () => Promise<void>;
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (productId: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  setProductImage: (productId: string, imageUrl: string) => Promise<void>;
+  removeProductImage: (productId: string) => Promise<void>;
+};
 
-      updateProduct: (productId, updates) =>
-        set((state) => ({
-          updatedProducts: {
-            ...state.updatedProducts,
-            [productId]: {
-              ...(state.updatedProducts[productId] ?? {}),
-              ...updates,
-            },
-          },
-        })),
+export const useAdminProducts = create<AdminProductsState>()((set, get) => ({
+  remoteProducts: {},
+  loaded: false,
+  loading: false,
 
-      deleteProduct: (productId) =>
-        set((state) => ({
-          customProducts: state.customProducts.filter(
-            (p) => p.id !== productId,
-          ),
-        })),
-    }),
-    { name: "cmda-admin-products" },
-  ),
-);
+  loadFromSupabase: async () => {
+    if (get().loading) return;
+    set({ loading: true });
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: true });
 
-function computeProducts(
-  customProducts: Product[],
-  updatedProducts: Record<string, Partial<Product>>,
-): Product[] {
-  const base: Product[] = [...baseProducts, ...customProducts];
+      if (error) {
+        console.error("Failed to load products from Supabase:", error.message);
+        return;
+      }
+
+      const map: Record<string, Product> = {};
+      for (const row of (data ?? []) as ProductRow[]) {
+        map[row.id] = rowToProduct(row);
+      }
+      set({ remoteProducts: map, loaded: true });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  addProduct: async (product) => {
+    const row = productToRow(product, true);
+    const { error } = await supabase.from("products").insert({
+      ...row,
+      created_at: new Date().toISOString(),
+    });
+    if (error) {
+      console.error("Failed to add product:", error.message);
+      return;
+    }
+    set((state) => ({
+      remoteProducts: { ...state.remoteProducts, [product.id]: product },
+    }));
+  },
+
+  updateProduct: async (productId, updates) => {
+    const existing = get().remoteProducts[productId];
+    const base = baseProducts.find((p) => p.id === productId);
+    const merged = existing ? { ...existing, ...updates } : base ? { ...base, ...updates } : null;
+    if (!merged) return;
+
+    const isCustom = !base;
+    const row = productToRow(merged, isCustom);
+    const { error } = await supabase
+      .from("products")
+      .upsert(row, { onConflict: "id" });
+    if (error) {
+      console.error("Failed to update product:", error.message);
+      return;
+    }
+    set((state) => ({
+      remoteProducts: { ...state.remoteProducts, [productId]: merged },
+    }));
+  },
+
+  deleteProduct: async (productId) => {
+    const { error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", productId);
+    if (error) {
+      console.error("Failed to delete product:", error.message);
+      return;
+    }
+    set((state) => {
+      const { [productId]: _, ...rest } = state.remoteProducts;
+      return { remoteProducts: rest };
+    });
+  },
+
+  setProductImage: async (productId, imageUrl) => {
+    const existing = get().remoteProducts[productId];
+    const base = baseProducts.find((p) => p.id === productId);
+    const product = existing ?? base;
+    if (!product) return;
+
+    const updated = { ...product, image: imageUrl };
+    const isCustom = !base && !existing;
+    const row = productToRow(updated, isCustom || !!existing);
+    const { error } = await supabase
+      .from("products")
+      .upsert(row, { onConflict: "id" });
+    if (error) {
+      console.error("Failed to save product image:", error.message);
+      return;
+    }
+    set((state) => ({
+      remoteProducts: { ...state.remoteProducts, [productId]: updated },
+    }));
+  },
+
+  removeProductImage: async (productId) => {
+    const existing = get().remoteProducts[productId];
+    if (!existing) return;
+
+    const updated = { ...existing, image: "" };
+    const row = productToRow(updated, true);
+    const { error } = await supabase
+      .from("products")
+      .upsert(row, { onConflict: "id" });
+    if (error) {
+      console.error("Failed to remove product image:", error.message);
+      return;
+    }
+    set((state) => ({
+      remoteProducts: { ...state.remoteProducts, [productId]: updated },
+    }));
+  },
+}));
+
+function mergeProducts(remoteProducts: Record<string, Product>): Product[] {
+  const base = [...baseProducts];
   return base.map((p) => {
-    const updates = updatedProducts[p.id];
-    return updates ? { ...p, ...updates } : p;
+    const remote = remoteProducts[p.id];
+    return remote ? { ...p, ...remote } : p;
   });
 }
 
 export function useProducts(): Product[] {
-  const customProducts = useAdminProducts((s) => s.customProducts);
-  const updatedProducts = useAdminProducts((s) => s.updatedProducts);
-  return useMemo(
-    () => computeProducts(customProducts, updatedProducts),
-    [customProducts, updatedProducts],
-  );
+  const remoteProducts = useAdminProducts((s) => s.remoteProducts);
+  const loaded = useAdminProducts((s) => s.loaded);
+
+  useEffect(() => {
+    if (!loaded) {
+      useAdminProducts.getState().loadFromSupabase();
+    }
+  }, [loaded]);
+
+  return useMemo(() => {
+    const customProducts = Object.values(remoteProducts).filter(
+      (p) => !baseProducts.some((b) => b.id === p.id),
+    );
+    return [...mergeProducts(remoteProducts), ...customProducts];
+  }, [remoteProducts]);
 }
 
 export function useProductImage(productId: string, fallbackImage: string): string {
-  const customImages = useAdminProducts((s) => s.customImages);
-  return customImages[productId] ?? fallbackImage;
+  const remoteProducts = useAdminProducts((s) => s.remoteProducts);
+  const remote = remoteProducts[productId];
+  return remote?.image || fallbackImage;
 }
 
 export function getProductImage(
   productId: string,
   fallbackImage: string,
 ): string {
-  const { customImages } = useAdminProducts.getState();
-  return customImages[productId] ?? fallbackImage;
+  const { remoteProducts } = useAdminProducts.getState();
+  const remote = remoteProducts[productId];
+  return remote?.image || fallbackImage;
 }
 
 export function getAllProducts(): Product[] {
-  const { customProducts, updatedProducts } = useAdminProducts.getState();
-  return computeProducts(customProducts, updatedProducts);
+  const { remoteProducts } = useAdminProducts.getState();
+  const customProducts = Object.values(remoteProducts).filter(
+    (p) => !baseProducts.some((b) => b.id === p.id),
+  );
+  return [...mergeProducts(remoteProducts), ...customProducts];
 }
 
 export function resolveProduct(id: string): Product | undefined {
@@ -105,8 +236,9 @@ export function resolveProduct(id: string): Product | undefined {
 
 export function useResolvedProduct(id: string): { product: Product; image: string } | undefined {
   const products = useProducts();
-  const customImages = useAdminProducts((s) => s.customImages);
+  const remoteProducts = useAdminProducts((s) => s.remoteProducts);
   const product = products.find((p) => p.id === id);
   if (!product) return undefined;
-  return { product, image: customImages[product.id] ?? product.image };
+  const remote = remoteProducts[product.id];
+  return { product, image: remote?.image || product.image };
 }

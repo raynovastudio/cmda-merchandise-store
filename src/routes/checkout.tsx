@@ -243,9 +243,9 @@ function CheckoutPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
-    const order = addOrder({
+    const order = await addOrder({
       customerName: fullName,
       customerEmail: email,
       customerPhone: phone,
