@@ -7,7 +7,9 @@ export function Footer() {
     <footer className="mt-24 border-t border-border/40 bg-foreground text-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr] lg:px-8">
         <div className="space-y-5">
-          <LogoFull className="h-11 w-auto brightness-0 invert" />
+          <div className="inline-flex items-center rounded-xl bg-white/10 px-3 py-2">
+            <LogoFull className="h-11 w-auto" />
+          </div>
           <p className="max-w-sm text-sm leading-relaxed text-background/60">
             The official merchandise store of the Christian Medical and Dental
             Association of Nigeria — Students&apos; Arm. Wear the vision. Support the mission.
