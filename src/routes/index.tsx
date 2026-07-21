@@ -73,7 +73,7 @@ function Index() {
             <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-gradient-to-br from-primary-soft via-background to-brand-green-soft blur-2xl opacity-60" />
             <div className="relative overflow-hidden rounded-[2rem] border border-border/40 shadow-card-hover">
               <img
-                src="/hero-image.jpg"
+                src="/New Hero Image.png"
                 alt="CMDA Nigeria members in branded merchandise"
                 width={1600}
                 height={1200}
