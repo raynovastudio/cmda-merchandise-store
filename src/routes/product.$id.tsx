@@ -113,14 +113,13 @@ function ProductPage() {
       </div>
 
       <section className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 sm:px-6 md:grid-cols-2 lg:px-8">
-        <div className="relative overflow-hidden rounded-[2rem] border border-border/40 bg-muted shadow-card">
+        <div className="group/img relative overflow-hidden rounded-2xl border border-border/30 bg-gradient-to-br from-muted via-muted/80 to-muted/60 shadow-card">
           <img
             src={getProductImage(product.id, product.image)}
             alt={product.name}
-            width={1024}
-            height={1280}
-            className="h-full w-full object-cover"
+            className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover/img:scale-105"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
           <div className="absolute left-4 top-4">
             <AvailabilityBadge availability={product.availability} />
           </div>

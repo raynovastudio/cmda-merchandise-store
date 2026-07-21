@@ -74,10 +74,8 @@ function CartPage() {
                       <img
                         src={getProductImage(p.id, p.image)}
                         alt={p.name}
-                        width={240}
-                        height={300}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                        className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                       />
                     </Link>
 
