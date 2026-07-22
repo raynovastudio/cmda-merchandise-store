@@ -89,6 +89,7 @@ function CheckoutPage() {
   const [fulfillmentMethod, setFulfillmentMethod] =
     useState<FulfillmentMethod>("conference-pickup");
   const [selectedConference, setSelectedConference] = useState("");
+  const [useDelegate, setUseDelegate] = useState(false);
   const [delegateName, setDelegateName] = useState("");
   const [delegatePhone, setDelegatePhone] = useState("");
   const [delegateEmail, setDelegateEmail] = useState("");
@@ -215,7 +216,7 @@ function CheckoutPage() {
   const canProceedCustomer = fullName && email && phone;
   const canProceedFulfillment =
     fulfillmentMethod === "conference-pickup"
-      ? !!selectedConference
+      ? !!selectedConference && (!useDelegate || (delegateName && delegatePhone && delegateRelationship))
       : fulfillmentMethod === "delegate-pickup"
         ? delegateName && delegatePhone && delegateRelationship
         : deliveryName && deliveryPhone && deliveryState && deliveryCity && deliveryAddress;
@@ -280,7 +281,15 @@ function CheckoutPage() {
               relationship: delegateRelationship,
               instructions: delegateInstructions,
             }
-          : undefined,
+          : fulfillmentMethod === "conference-pickup" && useDelegate && delegateName && delegatePhone
+            ? {
+                fullName: delegateName,
+                phone: delegatePhone,
+                email: delegateEmail,
+                relationship: delegateRelationship,
+                instructions: delegateInstructions,
+              }
+            : undefined,
       delivery:
         fulfillmentMethod === "delivery"
           ? {
@@ -550,6 +559,102 @@ function CheckoutPage() {
                           </div>
                         </button>
                       ))}
+
+                    {/* Delegate toggle */}
+                    {selectedConference && (
+                      <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-semibold text-foreground">
+                              Someone else picking up for you?
+                            </p>
+                            <p className="mt-0.5 text-sm text-muted-foreground">
+                              Assign a delegate to collect your order at the conference.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setUseDelegate((v) => !v)}
+                            className={cn(
+                              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors",
+                              useDelegate ? "bg-primary" : "bg-gray-300",
+                            )}
+                          >
+                            <span
+                              className={cn(
+                                "inline-block h-4 w-4 rounded-full bg-white transition-transform",
+                                useDelegate ? "translate-x-6" : "translate-x-1",
+                              )}
+                            />
+                          </button>
+                        </div>
+
+                        {useDelegate && (
+                          <div className="mt-4 space-y-4 border-t border-border pt-4">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                              <div className="sm:col-span-2">
+                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                                  Delegate's Full Name *
+                                </label>
+                                <input
+                                  value={delegateName}
+                                  onChange={(e) => setDelegateName(e.target.value)}
+                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                                  placeholder="Person's full name"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                                  Phone Number *
+                                </label>
+                                <input
+                                  value={delegatePhone}
+                                  onChange={(e) => setDelegatePhone(e.target.value)}
+                                  type="tel"
+                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                                  placeholder="+234 800 000 0000"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                                  Email <span className="text-muted-foreground">(Optional)</span>
+                                </label>
+                                <input
+                                  value={delegateEmail}
+                                  onChange={(e) => setDelegateEmail(e.target.value)}
+                                  type="email"
+                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                                  placeholder="email@example.com"
+                                />
+                              </div>
+                              <div>
+                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                                  Relationship *
+                                </label>
+                                <input
+                                  value={delegateRelationship}
+                                  onChange={(e) => setDelegateRelationship(e.target.value)}
+                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                                  placeholder="e.g. Colleague, Friend"
+                                />
+                              </div>
+                              <div className="sm:col-span-2">
+                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                                  Special Instructions
+                                </label>
+                                <textarea
+                                  value={delegateInstructions}
+                                  onChange={(e) => setDelegateInstructions(e.target.value)}
+                                  rows={2}
+                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none resize-none"
+                                  placeholder="Any instructions for the delegate..."
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 
