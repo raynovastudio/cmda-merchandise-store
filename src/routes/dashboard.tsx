@@ -4,6 +4,8 @@ import {
   ShoppingBag,
   ChevronRight,
   User,
+  Search,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -26,20 +28,47 @@ export const Route = createFileRoute("/dashboard")({
 type Tab = "all" | "active" | "completed";
 
 function DashboardPage() {
-  const orders = useOrders((s) => s.orders);
+  const allOrders = useOrders((s) => s.orders);
   const [tab, setTab] = useState<Tab>("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  const filtered = orders.filter((o) => {
+  // Email-based identity
+  const [lookupEmail, setLookupEmail] = useState(
+    () => localStorage.getItem("cmda-customer-email") ?? "",
+  );
+  const [emailInput, setEmailInput] = useState(lookupEmail);
+  const [submitted, setSubmitted] = useState(!!lookupEmail);
+
+  const customerEmail = lookupEmail.trim().toLowerCase();
+  const myOrders = submitted
+    ? allOrders.filter((o) => o.customerEmail.trim().toLowerCase() === customerEmail)
+    : [];
+
+  const filtered = myOrders.filter((o) => {
     if (tab === "active") return !["completed", "cancelled"].includes(o.status);
-    if (tab === "completed")
-      return ["completed", "delivered"].includes(o.status);
+    if (tab === "completed") return ["completed", "delivered"].includes(o.status);
     return true;
   });
 
-  const activeCount = orders.filter(
+  const activeCount = myOrders.filter(
     (o) => !["completed", "cancelled"].includes(o.status),
   ).length;
+
+  const handleLookup = () => {
+    const email = emailInput.trim();
+    if (!email) return;
+    localStorage.setItem("cmda-customer-email", email);
+    setLookupEmail(email);
+    setSubmitted(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("cmda-customer-email");
+    setLookupEmail("");
+    setEmailInput("");
+    setSubmitted(false);
+    setSelectedOrder(null);
+  };
 
   if (selectedOrder) {
     return (
@@ -65,7 +94,6 @@ function DashboardPage() {
           </div>
 
           <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-            {/* Timeline */}
             <div className="rounded-2xl border border-border/50 bg-card p-6">
               <p className="font-display text-lg font-bold text-foreground">
                 Order Timeline
@@ -75,7 +103,6 @@ function DashboardPage() {
               </div>
             </div>
 
-            {/* Details */}
             <div className="space-y-4">
               <div className="rounded-2xl border border-border/50 bg-card p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
@@ -161,36 +188,12 @@ function DashboardPage() {
                 )}
                 {selectedOrder.pickupCode && (
                   <div className="mt-3 rounded-xl bg-secondary/60 p-3">
-                    <p className="text-xs text-muted-foreground">
-                      Pickup Code
-                    </p>
+                    <p className="text-xs text-muted-foreground">Pickup Code</p>
                     <p className="font-display text-xl tracking-wider text-foreground">
                       {selectedOrder.pickupCode}
                     </p>
                   </div>
                 )}
-              </div>
-
-              <div className="rounded-2xl border border-border/50 bg-card p-5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                  Customer
-                </p>
-                <div className="mt-2 space-y-1 text-sm">
-                  <p className="font-semibold text-foreground">
-                    {selectedOrder.customerName}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {selectedOrder.customerEmail}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {selectedOrder.customerPhone}
-                  </p>
-                  {selectedOrder.membershipNumber && (
-                    <p className="text-muted-foreground">
-                      {selectedOrder.membershipNumber}
-                    </p>
-                  )}
-                </div>
               </div>
 
               {selectedOrder.paymentProof && (
@@ -200,21 +203,14 @@ function DashboardPage() {
                   </p>
                   <div className="mt-2 space-y-1 text-sm text-muted-foreground">
                     <p>{selectedOrder.paymentProof.fileName}</p>
-                    <p>
-                      Amount:{" "}
-                      {formatNaira(selectedOrder.paymentProof.amountPaid)}
-                    </p>
+                    <p>Amount: {formatNaira(selectedOrder.paymentProof.amountPaid)}</p>
                     <p>Date: {selectedOrder.paymentProof.paymentDate}</p>
                     {selectedOrder.paymentProof.paymentReference && (
-                      <p>
-                        Ref: {selectedOrder.paymentProof.paymentReference}
-                      </p>
+                      <p>Ref: {selectedOrder.paymentProof.paymentReference}</p>
                     )}
                   </div>
                   {selectedOrder.paymentProof.fileDataUrl &&
-                    selectedOrder.paymentProof.fileDataUrl.startsWith(
-                      "data:image",
-                    ) && (
+                    selectedOrder.paymentProof.fileDataUrl.startsWith("data:image") && (
                       <img
                         src={selectedOrder.paymentProof.fileDataUrl}
                         alt="Payment proof"
@@ -230,37 +226,94 @@ function DashboardPage() {
     );
   }
 
+  // Email lookup screen
+  if (!submitted) {
+    return (
+      <SiteLayout>
+        <section className="mx-auto max-w-lg px-4 py-16 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="mx-auto grid h-14 w-14 place-items-center rounded-xl bg-primary-soft text-primary">
+              <User className="h-6 w-6" />
+            </div>
+            <h1 className="mt-4 font-display text-3xl font-bold text-foreground">
+              Track Your Orders
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Enter the email address you used at checkout to see your orders.
+            </p>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-border/50 bg-card p-6 shadow-card">
+            <label className="mb-2 block text-sm font-semibold text-foreground">
+              Email Address
+            </label>
+            <div className="flex gap-2">
+              <input
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLookup()}
+                type="email"
+                className="flex-1 rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                placeholder="john@example.com"
+              />
+              <button
+                onClick={handleLookup}
+                disabled={!emailInput.trim()}
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                <Search className="h-4 w-4" />
+                Find Orders
+              </button>
+            </div>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            Don't have an account? No problem — just use the same email you entered when placing your order.
+          </p>
+        </section>
+      </SiteLayout>
+    );
+  }
+
   return (
     <SiteLayout>
       <section className="border-b border-border/50 bg-secondary/30">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-soft text-primary">
-              <User className="h-5 w-5" />
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary-soft text-primary">
+                <User className="h-5 w-5" />
+              </div>
+              <div>
+                <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
+                  My Orders
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {lookupEmail}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
-                My Orders
-              </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Track your merchandise orders and view history.
-              </p>
-            </div>
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-card px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Switch Email</span>
+            </button>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Tabs */}
         <div className="flex gap-1 rounded-xl border border-border bg-background p-1">
           {(
             [
-              { key: "all" as Tab, label: "All Orders", count: orders.length },
+              { key: "all" as Tab, label: "All Orders", count: myOrders.length },
               { key: "active" as Tab, label: "Active", count: activeCount },
               {
                 key: "completed" as Tab,
                 label: "Completed",
-                count: orders.length - activeCount,
+                count: myOrders.length - activeCount,
               },
             ] as const
           ).map(({ key, label, count }) => (
@@ -286,14 +339,14 @@ function DashboardPage() {
             </div>
             <p className="mt-4 font-display text-2xl text-foreground">
               {tab === "all"
-                ? "No orders yet"
+                ? "No orders found"
                 : tab === "active"
                   ? "No active orders"
                   : "No completed orders"}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {tab === "all"
-                ? "When you place an order, it will appear here."
+                ? `No orders found for ${lookupEmail}. Check the email you used at checkout.`
                 : "Check back later."}
             </p>
             <Link

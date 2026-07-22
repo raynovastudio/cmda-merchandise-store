@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { formatNaira } from "@/data/products";
@@ -104,7 +105,9 @@ function CartPage() {
   const items = useCart((s) => s.items);
   const updateQuantity = useCart((s) => s.updateQuantity);
   const remove = useCart((s) => s.remove);
+  const clear = useCart((s) => s.clear);
   const subtotal = useCartSubtotal();
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const hasItems = items.length > 0;
 
@@ -185,10 +188,47 @@ function CartPage() {
               >
                 Continue shopping
               </Link>
+              <button
+                onClick={() => setShowClearConfirm(true)}
+                className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-border px-6 py-3 text-sm font-medium text-muted-foreground transition-all hover:border-red-300 hover:bg-red-50 hover:text-red-600"
+              >
+                <Trash2 className="mr-1.5 h-4 w-4" />
+                Clear cart
+              </button>
             </aside>
           </div>
         )}
       </section>
+
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-card p-6 shadow-xl">
+            <h3 className="font-display text-lg font-bold text-foreground">
+              Clear your cart?
+            </h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              This will remove all items from your cart. You can always add them back later.
+            </p>
+            <div className="mt-5 flex gap-3">
+              <button
+                onClick={() => setShowClearConfirm(false)}
+                className="flex-1 rounded-xl border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-background"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  clear();
+                  setShowClearConfirm(false);
+                }}
+                className="flex-1 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-red-700"
+              >
+                Clear cart
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </SiteLayout>
   );
 }
