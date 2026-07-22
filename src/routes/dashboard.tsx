@@ -169,12 +169,10 @@ function DashboardPage() {
                     {selectedOrder.conferencePickup.conferenceName}
                   </p>
                 )}
-                {selectedOrder.delegatePickup && (
-                  <div className="mt-2 text-sm text-muted-foreground">
-                    <p>{selectedOrder.delegatePickup.fullName}</p>
-                    <p>{selectedOrder.delegatePickup.phone}</p>
-                    <p>{selectedOrder.delegatePickup.relationship}</p>
-                  </div>
+                {selectedOrder.fulfillmentMethod === "wholeness-pickup" && (
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Wholeness House, Gwagwalada, FCT
+                  </p>
                 )}
                 {selectedOrder.delivery && (
                   <div className="mt-2 text-sm text-muted-foreground">

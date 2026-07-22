@@ -51,7 +51,7 @@ function AdminOrders() {
     if (filterTab === "pickup")
       return (
         o.fulfillmentMethod === "conference-pickup" ||
-        o.fulfillmentMethod === "delegate-pickup"
+        o.fulfillmentMethod === "wholeness-pickup"
       );
     if (filterTab === "delivery") return o.fulfillmentMethod === "delivery";
     if (filterTab === "completed")
@@ -89,7 +89,7 @@ function AdminOrders() {
       count: orders.filter(
         (o) =>
           o.fulfillmentMethod === "conference-pickup" ||
-          o.fulfillmentMethod === "delegate-pickup",
+          o.fulfillmentMethod === "wholeness-pickup",
       ).length,
     },
     {
@@ -143,7 +143,7 @@ function AdminOrders() {
       "payment-verified",
       "preparing-order",
       "ready-for-conference-pickup",
-      "ready-for-delegate-pickup",
+      "ready-for-wholeness-pickup",
       "ready-for-delivery",
       "shipped",
       "delivered",
@@ -344,22 +344,10 @@ function AdminOrders() {
                     {selectedOrder.conferencePickup.conferenceName}
                   </p>
                 )}
-                {selectedOrder.delegatePickup && (
-                  <div className="mt-2 space-y-1 text-muted-foreground">
-                    <p className="font-medium text-gray-900">
-                      {selectedOrder.delegatePickup.fullName}
-                    </p>
-                    <p>{selectedOrder.delegatePickup.phone}</p>
-                    <p>{selectedOrder.delegatePickup.email}</p>
-                    <p>
-                      Relationship: {selectedOrder.delegatePickup.relationship}
-                    </p>
-                    {selectedOrder.delegatePickup.instructions && (
-                      <p className="italic">
-                        "{selectedOrder.delegatePickup.instructions}"
-                      </p>
-                    )}
-                  </div>
+                {selectedOrder.fulfillmentMethod === "wholeness-pickup" && (
+                  <p className="mt-1 text-muted-foreground">
+                    Wholeness House, Gwagwalada, FCT
+                  </p>
                 )}
                 {selectedOrder.delivery && (
                   <div className="mt-2 space-y-1 text-muted-foreground">
@@ -450,9 +438,9 @@ function AdminOrders() {
               <p className="mt-2 text-sm text-muted-foreground">
                 {selectedOrder.customerName}
               </p>
-              {selectedOrder.delegatePickup && (
+              {selectedOrder.fulfillmentMethod === "wholeness-pickup" && (
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Authorized: {selectedOrder.delegatePickup.fullName}
+                  Wholeness House, Gwagwalada, FCT
                 </p>
               )}
               <button

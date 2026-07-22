@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-export type FulfillmentMethod = "conference-pickup" | "delegate-pickup" | "delivery";
+export type FulfillmentMethod = "conference-pickup" | "wholeness-pickup" | "delivery";
 
 export type OrderStatus =
   | "awaiting-payment"
@@ -10,7 +10,7 @@ export type OrderStatus =
   | "payment-verified"
   | "preparing-order"
   | "ready-for-conference-pickup"
-  | "ready-for-delegate-pickup"
+  | "ready-for-wholeness-pickup"
   | "ready-for-delivery"
   | "shipped"
   | "delivered"
@@ -23,7 +23,7 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   "payment-verified": "Payment Verified",
   "preparing-order": "Preparing Order",
   "ready-for-conference-pickup": "Ready for Conference Pickup",
-  "ready-for-delegate-pickup": "Ready for Delegate Pickup",
+  "ready-for-wholeness-pickup": "Ready for Wholeness House Pickup",
   "ready-for-delivery": "Ready for Delivery",
   "shipped": "Shipped",
   "delivered": "Delivered",
@@ -44,14 +44,6 @@ export type OrderItem = {
 export type ConferencePickup = {
   conferenceId: string;
   conferenceName: string;
-};
-
-export type DelegatePickup = {
-  fullName: string;
-  phone: string;
-  email: string;
-  relationship: string;
-  instructions: string;
 };
 
 export type DeliveryInfo = {
@@ -81,7 +73,6 @@ export type Order = {
   items: OrderItem[];
   fulfillmentMethod: FulfillmentMethod;
   conferencePickup?: ConferencePickup;
-  delegatePickup?: DelegatePickup;
   delivery?: DeliveryInfo;
   paymentProof?: PaymentProof;
   subtotal: number;
@@ -104,7 +95,6 @@ type OrderRow = {
   items: OrderItem[];
   fulfillment_method: string;
   conference_pickup: ConferencePickup | null;
-  delegate_pickup: DelegatePickup | null;
   delivery: DeliveryInfo | null;
   payment_proof: PaymentProof | null;
   subtotal: number;
@@ -129,7 +119,6 @@ function rowToOrder(row: OrderRow): Order {
     items: row.items ?? [],
     fulfillmentMethod: row.fulfillment_method as FulfillmentMethod,
     conferencePickup: row.conference_pickup ?? undefined,
-    delegatePickup: row.delegate_pickup ?? undefined,
     delivery: row.delivery ?? undefined,
     paymentProof: row.payment_proof ?? undefined,
     subtotal: row.subtotal,
@@ -228,7 +217,6 @@ export const useOrders = create<OrderState>()((set, get) => ({
       items: order.items,
       fulfillment_method: order.fulfillmentMethod,
       conference_pickup: order.conferencePickup ?? null,
-      delegate_pickup: order.delegatePickup ?? null,
       delivery: order.delivery ?? null,
       payment_proof: order.paymentProof ?? null,
       subtotal: order.subtotal,
@@ -291,7 +279,7 @@ export const STATUS_FLOW: OrderStatus[] = [
   "payment-verified",
   "preparing-order",
   "ready-for-conference-pickup",
-  "ready-for-delegate-pickup",
+  "ready-for-wholeness-pickup",
   "ready-for-delivery",
   "shipped",
   "delivered",

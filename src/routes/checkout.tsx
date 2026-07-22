@@ -7,7 +7,6 @@ import {
   Upload,
   User,
   Truck,
-  Users,
   Calendar,
   Package,
   CheckCircle2,
@@ -87,14 +86,8 @@ function CheckoutPage() {
 
   // Fulfillment
   const [fulfillmentMethod, setFulfillmentMethod] =
-    useState<FulfillmentMethod>("conference-pickup");
+    useState<FulfillmentMethod>("wholeness-pickup");
   const [selectedConference, setSelectedConference] = useState("");
-  const [useDelegate, setUseDelegate] = useState(false);
-  const [delegateName, setDelegateName] = useState("");
-  const [delegatePhone, setDelegatePhone] = useState("");
-  const [delegateEmail, setDelegateEmail] = useState("");
-  const [delegateRelationship, setDelegateRelationship] = useState("");
-  const [delegateInstructions, setDelegateInstructions] = useState("");
   const [deliveryName, setDeliveryName] = useState("");
   const [deliveryPhone, setDeliveryPhone] = useState("");
   const [deliveryState, setDeliveryState] = useState("");
@@ -216,9 +209,9 @@ function CheckoutPage() {
   const canProceedCustomer = fullName && email && phone;
   const canProceedFulfillment =
     fulfillmentMethod === "conference-pickup"
-      ? !!selectedConference && (!useDelegate || (delegateName && delegatePhone && delegateRelationship))
-      : fulfillmentMethod === "delegate-pickup"
-        ? delegateName && delegatePhone && delegateRelationship
+      ? !!selectedConference
+      : fulfillmentMethod === "wholeness-pickup"
+        ? true
         : deliveryName && deliveryPhone && deliveryState && deliveryCity && deliveryAddress;
   const canProceedPayment = proofFile && proofAmount && proofDate;
   const canSubmit = canProceedCustomer && canProceedFulfillment && canProceedPayment;
@@ -272,24 +265,6 @@ function CheckoutPage() {
                 conferences.find((c) => c.id === selectedConference)?.name || "",
             }
           : undefined,
-      delegatePickup:
-        fulfillmentMethod === "delegate-pickup"
-          ? {
-              fullName: delegateName,
-              phone: delegatePhone,
-              email: delegateEmail,
-              relationship: delegateRelationship,
-              instructions: delegateInstructions,
-            }
-          : fulfillmentMethod === "conference-pickup" && useDelegate && delegateName && delegatePhone
-            ? {
-                fullName: delegateName,
-                phone: delegatePhone,
-                email: delegateEmail,
-                relationship: delegateRelationship,
-                instructions: delegateInstructions,
-              }
-            : undefined,
       delivery:
         fulfillmentMethod === "delivery"
           ? {
@@ -469,16 +444,16 @@ function CheckoutPage() {
                         desc: "Collect at a listed CMDA conference",
                       },
                       {
-                        key: "delegate-pickup" as const,
-                        icon: Users,
-                        title: "Someone Else Picks Up",
-                        desc: "Nominate a representative",
+                        key: "wholeness-pickup" as const,
+                        icon: Package,
+                        title: "Pick up at Wholeness House",
+                        desc: "Collect at our office in Gwagwalada",
                       },
                       {
                         key: "delivery" as const,
                         icon: Truck,
-                        title: "Delivery via Waybill",
-                        desc: "Nationwide delivery",
+                        title: "Nationwide Delivery",
+                        desc: "Delivered to your location",
                       },
                     ] as const
                   ).map(({ key, icon: Icon, title, desc }) => (
@@ -559,175 +534,21 @@ function CheckoutPage() {
                           </div>
                         </button>
                       ))}
-
-                    {/* Delegate toggle */}
-                    {selectedConference && (
-                      <div className="mt-4 rounded-2xl border border-border/60 bg-card p-5">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="font-semibold text-foreground">
-                              Someone else picking up for you?
-                            </p>
-                            <p className="mt-0.5 text-sm text-muted-foreground">
-                              Assign a delegate to collect your order at the conference.
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => setUseDelegate((v) => !v)}
-                            className={cn(
-                              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors",
-                              useDelegate ? "bg-primary" : "bg-gray-300",
-                            )}
-                          >
-                            <span
-                              className={cn(
-                                "inline-block h-4 w-4 rounded-full bg-white transition-transform",
-                                useDelegate ? "translate-x-6" : "translate-x-1",
-                              )}
-                            />
-                          </button>
-                        </div>
-
-                        {useDelegate && (
-                          <div className="mt-4 space-y-4 border-t border-border pt-4">
-                            <div className="grid gap-4 sm:grid-cols-2">
-                              <div className="sm:col-span-2">
-                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                                  Delegate's Full Name *
-                                </label>
-                                <input
-                                  value={delegateName}
-                                  onChange={(e) => setDelegateName(e.target.value)}
-                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                                  placeholder="Person's full name"
-                                />
-                              </div>
-                              <div>
-                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                                  Phone Number *
-                                </label>
-                                <input
-                                  value={delegatePhone}
-                                  onChange={(e) => setDelegatePhone(e.target.value)}
-                                  type="tel"
-                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                                  placeholder="+234 800 000 0000"
-                                />
-                              </div>
-                              <div>
-                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                                  Email <span className="text-muted-foreground">(Optional)</span>
-                                </label>
-                                <input
-                                  value={delegateEmail}
-                                  onChange={(e) => setDelegateEmail(e.target.value)}
-                                  type="email"
-                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                                  placeholder="email@example.com"
-                                />
-                              </div>
-                              <div>
-                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                                  Relationship *
-                                </label>
-                                <input
-                                  value={delegateRelationship}
-                                  onChange={(e) => setDelegateRelationship(e.target.value)}
-                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                                  placeholder="e.g. Colleague, Friend"
-                                />
-                              </div>
-                              <div className="sm:col-span-2">
-                                <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                                  Special Instructions
-                                </label>
-                                <textarea
-                                  value={delegateInstructions}
-                                  onChange={(e) => setDelegateInstructions(e.target.value)}
-                                  rows={2}
-                                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none resize-none"
-                                  placeholder="Any instructions for the delegate..."
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* Delegate pickup */}
-                {fulfillmentMethod === "delegate-pickup" && (
-                  <div className="mt-4 space-y-4 rounded-2xl border border-border/60 bg-card p-6">
+                {/* Wholeness House pickup */}
+                {fulfillmentMethod === "wholeness-pickup" && (
+                  <div className="mt-4 rounded-2xl border border-border/60 bg-card p-6">
                     <p className="font-display text-lg font-bold text-foreground">
-                      Pickup Person's Details
+                      Pickup at Wholeness House
                     </p>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                          Full Name *
-                        </label>
-                        <input
-                          value={delegateName}
-                          onChange={(e) => setDelegateName(e.target.value)}
-                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                          placeholder="Person's full name"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                          Phone Number *
-                        </label>
-                        <input
-                          value={delegatePhone}
-                          onChange={(e) => setDelegatePhone(e.target.value)}
-                          type="tel"
-                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                          placeholder="+234 800 000 0000"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                          Email{" "}
-                          <span className="text-muted-foreground">(Optional)</span>
-                        </label>
-                        <input
-                          value={delegateEmail}
-                          onChange={(e) => setDelegateEmail(e.target.value)}
-                          type="email"
-                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                          placeholder="email@example.com"
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                          Relationship *
-                        </label>
-                        <input
-                          value={delegateRelationship}
-                          onChange={(e) =>
-                            setDelegateRelationship(e.target.value)
-                          }
-                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                          placeholder="e.g. Colleague, Friend"
-                        />
-                      </div>
-                      <div className="sm:col-span-2">
-                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                          Special Instructions
-                        </label>
-                        <textarea
-                          value={delegateInstructions}
-                          onChange={(e) =>
-                            setDelegateInstructions(e.target.value)
-                          }
-                          rows={3}
-                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none resize-none"
-                          placeholder="Any special instructions for pickup..."
-                        />
-                      </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Your order will be available for collection at our national office.
+                    </p>
+                    <div className="mt-4 rounded-xl bg-secondary/60 p-4 space-y-1 text-sm">
+                      <p className="font-semibold text-foreground">Wholeness House</p>
+                      <p className="text-muted-foreground">Gwagwalada, FCT, Nigeria</p>
                     </div>
                   </div>
                 )}
@@ -1059,12 +880,10 @@ function CheckoutPage() {
                         {conferences.find((c) => c.id === selectedConference)?.name}
                       </p>
                     )}
-                    {fulfillmentMethod === "delegate-pickup" && (
-                      <div className="mt-1 space-y-0.5 text-muted-foreground">
-                        <p>{delegateName}</p>
-                        <p>{delegatePhone}</p>
-                        <p>{delegateRelationship}</p>
-                      </div>
+                    {fulfillmentMethod === "wholeness-pickup" && (
+                      <p className="mt-1 text-muted-foreground">
+                        Wholeness House, Gwagwalada, FCT
+                      </p>
                     )}
                     {fulfillmentMethod === "delivery" && (
                       <div className="mt-1 space-y-0.5 text-muted-foreground">

@@ -12,7 +12,7 @@ const STATUS_ORDER: OrderStatus[] = [
   "payment-verified",
   "preparing-order",
   "ready-for-conference-pickup",
-  "ready-for-delegate-pickup",
+  "ready-for-wholeness-pickup",
   "ready-for-delivery",
   "shipped",
   "delivered",
@@ -36,8 +36,8 @@ export function OrderTimeline({ order }: { order: Order }) {
         )
           return null;
         if (
-          status === "ready-for-delegate-pickup" &&
-          order.fulfillmentMethod !== "delegate-pickup"
+          status === "ready-for-wholeness-pickup" &&
+          order.fulfillmentMethod !== "wholeness-pickup"
         )
           return null;
         if (
@@ -114,7 +114,7 @@ export function StatusBadge({ status }: { status: OrderStatus }) {
     "payment-verified": "bg-emerald-50 text-emerald-700",
     "preparing-order": "bg-purple-50 text-purple-700",
     "ready-for-conference-pickup": "bg-emerald-50 text-emerald-700",
-    "ready-for-delegate-pickup": "bg-emerald-50 text-emerald-700",
+    "ready-for-wholeness-pickup": "bg-emerald-50 text-emerald-700",
     "ready-for-delivery": "bg-emerald-50 text-emerald-700",
     shipped: "bg-blue-50 text-blue-700",
     delivered: "bg-emerald-50 text-emerald-700",
