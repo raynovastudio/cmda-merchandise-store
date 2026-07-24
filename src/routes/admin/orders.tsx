@@ -349,6 +349,18 @@ function AdminOrders() {
                     Wholeness House, Gwagwalada, FCT
                   </p>
                 )}
+                {selectedOrder.delegatePickup && (
+                  <div className="mt-2 rounded-xl bg-gray-50 p-3 space-y-0.5 text-sm text-muted-foreground">
+                    <p className="font-medium text-gray-900">
+                      Delegate: {selectedOrder.delegatePickup.fullName}
+                    </p>
+                    <p>{selectedOrder.delegatePickup.phone}</p>
+                    <p>{selectedOrder.delegatePickup.relationship}</p>
+                    {selectedOrder.delegatePickup.instructions && (
+                      <p className="italic mt-1">"{selectedOrder.delegatePickup.instructions}"</p>
+                    )}
+                  </div>
+                )}
                 {selectedOrder.delivery && (
                   <div className="mt-2 space-y-1 text-muted-foreground">
                     <p>{selectedOrder.delivery.recipientName}</p>
@@ -441,6 +453,11 @@ function AdminOrders() {
               {selectedOrder.fulfillmentMethod === "wholeness-pickup" && (
                 <p className="mt-1 text-sm text-muted-foreground">
                   Wholeness House, Gwagwalada, FCT
+                </p>
+              )}
+              {selectedOrder.delegatePickup && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Authorized: {selectedOrder.delegatePickup.fullName}
                 </p>
               )}
               <button

@@ -174,6 +174,18 @@ function DashboardPage() {
                     Wholeness House, Gwagwalada, FCT
                   </p>
                 )}
+                {selectedOrder.delegatePickup && (
+                  <div className="mt-2 rounded-xl bg-secondary/60 p-3 text-sm text-muted-foreground">
+                    <p className="font-medium text-foreground">
+                      Delegate: {selectedOrder.delegatePickup.fullName}
+                    </p>
+                    <p>{selectedOrder.delegatePickup.phone}</p>
+                    <p>{selectedOrder.delegatePickup.relationship}</p>
+                    {selectedOrder.delegatePickup.instructions && (
+                      <p className="italic mt-1">"{selectedOrder.delegatePickup.instructions}"</p>
+                    )}
+                  </div>
+                )}
                 {selectedOrder.delivery && (
                   <div className="mt-2 text-sm text-muted-foreground">
                     <p>{selectedOrder.delivery.recipientName}</p>

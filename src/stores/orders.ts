@@ -46,6 +46,14 @@ export type ConferencePickup = {
   conferenceName: string;
 };
 
+export type DelegatePickup = {
+  fullName: string;
+  phone: string;
+  email: string;
+  relationship: string;
+  instructions: string;
+};
+
 export type DeliveryInfo = {
   recipientName: string;
   phone: string;
@@ -73,6 +81,7 @@ export type Order = {
   items: OrderItem[];
   fulfillmentMethod: FulfillmentMethod;
   conferencePickup?: ConferencePickup;
+  delegatePickup?: DelegatePickup;
   delivery?: DeliveryInfo;
   paymentProof?: PaymentProof;
   subtotal: number;
@@ -95,6 +104,7 @@ type OrderRow = {
   items: OrderItem[];
   fulfillment_method: string;
   conference_pickup: ConferencePickup | null;
+  delegate_pickup: DelegatePickup | null;
   delivery: DeliveryInfo | null;
   payment_proof: PaymentProof | null;
   subtotal: number;
@@ -119,6 +129,7 @@ function rowToOrder(row: OrderRow): Order {
     items: row.items ?? [],
     fulfillmentMethod: row.fulfillment_method as FulfillmentMethod,
     conferencePickup: row.conference_pickup ?? undefined,
+    delegatePickup: row.delegate_pickup ?? undefined,
     delivery: row.delivery ?? undefined,
     paymentProof: row.payment_proof ?? undefined,
     subtotal: row.subtotal,
@@ -217,6 +228,7 @@ export const useOrders = create<OrderState>()((set, get) => ({
       items: order.items,
       fulfillment_method: order.fulfillmentMethod,
       conference_pickup: order.conferencePickup ?? null,
+      delegate_pickup: order.delegatePickup ?? null,
       delivery: order.delivery ?? null,
       payment_proof: order.paymentProof ?? null,
       subtotal: order.subtotal,
