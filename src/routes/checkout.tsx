@@ -232,7 +232,7 @@ function CheckoutPage() {
   };
 
   const copyAccountNumber = () => {
-    navigator.clipboard.writeText("1234567890");
+    navigator.clipboard.writeText("6576866256");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -695,7 +695,7 @@ function CheckoutPage() {
                           Account Name
                         </p>
                         <p className="font-semibold text-foreground">
-                          CMDA Nigeria Merchandise
+                          Christian Medical and Dental Association of Nigeria
                         </p>
                       </div>
                     </div>
@@ -705,7 +705,7 @@ function CheckoutPage() {
                           Account Number
                         </p>
                         <p className="font-display text-xl font-bold tracking-wider text-foreground">
-                          1234567890
+                          6576866256
                         </p>
                       </div>
                       <button
