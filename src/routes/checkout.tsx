@@ -12,6 +12,7 @@ import {
   CheckCircle2,
   AlertCircle,
   FileText,
+  Info,
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -27,6 +28,11 @@ import { nigerianStates } from "@/data/conferences";
 import { useConferences } from "@/stores/conferences";
 import { cn } from "@/lib/utils";
 import { getProductImage, resolveProduct, useResolvedProduct } from "@/stores/adminProducts";
+
+function calculatePaystackFee(amount: number): number {
+  if (amount <= 2500) return 0;
+  return Math.min(amount * 0.015 + 100, 2000);
+}
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({
@@ -237,6 +243,8 @@ function CheckoutPage() {
   const subtotal = useCartSubtotal();
   const deliveryFee = fulfillmentMethod === "delivery" ? 0 : 0;
   const grandTotal = subtotal + deliveryFee;
+  const paystackFee = calculatePaystackFee(grandTotal);
+  const paystackTotal = grandTotal + paystackFee;
 
   if (items.length === 0 && !submitted) {
     return (
@@ -429,7 +437,7 @@ function CheckoutPage() {
             ? {
                 fileName: "paystack-payment",
                 fileDataUrl: "",
-                amountPaid: grandTotal,
+                amountPaid: paystackTotal,
                 paymentDate: new Date().toISOString().slice(0, 10),
                 paymentReference: "Paid via Paystack",
               }
@@ -927,15 +935,35 @@ function CheckoutPage() {
                     <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
                       <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
                         <p className="text-sm font-medium text-primary-foreground/80">
-                          Total to pay
+                          Order subtotal
                         </p>
                         <p className="mt-1 font-display text-2xl font-bold text-primary-foreground">
-                          {formatNaira(grandTotal)}
+                          {formatNaira(paystackTotal)}
                         </p>
                       </div>
-                      <div className="p-6">
-                        <p className="text-sm text-muted-foreground">
-                          Click the button below to pay securely via Paystack. You can pay with debit card, bank transfer, USSD, or other methods.
+                      <div className="p-6 space-y-3">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">Subtotal</span>
+                          <span className="font-medium text-foreground">{formatNaira(grandTotal)}</span>
+                        </div>
+                        {paystackFee > 0 && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              Paystack fee
+                              <Info className="h-3.5 w-3.5" />
+                            </span>
+                            <span className="font-medium text-foreground">{formatNaira(paystackFee)}</span>
+                          </div>
+                        )}
+                        {paystackFee === 0 && (
+                          <p className="text-xs text-green-600 font-medium">No Paystack fee for orders under ₦2,500</p>
+                        )}
+                        <div className="border-t border-border/60 pt-3 flex items-center justify-between">
+                          <span className="text-sm font-semibold text-foreground">Total to pay</span>
+                          <span className="font-display text-lg font-bold text-primary">{formatNaira(paystackTotal)}</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Fee: 1.5% + ₦100 (capped at ₦2,000, waived under ₦2,500)
                         </p>
                       </div>
                     </div>
@@ -946,7 +974,7 @@ function CheckoutPage() {
                       className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground shadow-elegant transition-all hover:shadow-lg hover:-translate-y-0.5"
                     >
                       <CreditCard className="h-4 w-4" />
-                      Pay {formatNaira(grandTotal)} with Paystack
+                      Pay {formatNaira(paystackTotal)} with Paystack
                     </a>
                     <p className="text-center text-xs text-muted-foreground">
                       After payment, return here and click "Submit Order" to complete your order.
@@ -1192,18 +1220,31 @@ function CheckoutPage() {
                 {/* Payment proof */}
                 <div className="rounded-2xl border border-border/60 bg-card p-5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-muted-foreground">
-                    Payment Proof
+                    Payment
                   </p>
                   <div className="mt-2 space-y-1 text-sm">
-                    <p className="text-muted-foreground">{proofFile?.name}</p>
-                    <p className="text-muted-foreground">
-                      Amount: {formatNaira(Number(proofAmount))}
-                    </p>
-                    <p className="text-muted-foreground">Date: {proofDate}</p>
-                    {proofReference && (
-                      <p className="text-muted-foreground">
-                        Reference: {proofReference}
-                      </p>
+                    {paymentMethod === "paystack" ? (
+                      <>
+                        <p className="font-medium text-foreground">Paystack</p>
+                        <p className="text-muted-foreground">Amount: {formatNaira(paystackTotal)}</p>
+                        {paystackFee > 0 && (
+                          <p className="text-muted-foreground">(includes {formatNaira(paystackFee)} Paystack fee)</p>
+                        )}
+                        <p className="text-muted-foreground">Date: {new Date().toISOString().slice(0, 10)}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-muted-foreground">{proofFile?.name}</p>
+                        <p className="text-muted-foreground">
+                          Amount: {formatNaira(Number(proofAmount))}
+                        </p>
+                        <p className="text-muted-foreground">Date: {proofDate}</p>
+                        {proofReference && (
+                          <p className="text-muted-foreground">
+                            Reference: {proofReference}
+                          </p>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -1250,11 +1291,19 @@ function CheckoutPage() {
                     : "Free"}
                 </dd>
               </div>
+              {paymentMethod === "paystack" && paystackFee > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-muted-foreground flex items-center gap-1">Paystack fee <Info className="h-3 w-3" /></dt>
+                  <dd className="text-muted-foreground">{formatNaira(paystackFee)}</dd>
+                </div>
+              )}
               <div className="my-2 h-px bg-border" />
               <div className="flex justify-between">
-                <dt className="font-display text-lg font-bold text-foreground">Total</dt>
+                <dt className="font-display text-lg font-bold text-foreground">
+                  {paymentMethod === "paystack" ? "Total to pay" : "Total"}
+                </dt>
                 <dd className="font-display text-lg font-bold text-foreground">
-                  {formatNaira(grandTotal)}
+                  {formatNaira(paymentMethod === "paystack" ? paystackTotal : grandTotal)}
                 </dd>
               </div>
             </dl>
