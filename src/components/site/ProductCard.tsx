@@ -58,8 +58,11 @@ export function ProductCard({ product }: { product: Product }) {
           <p className="text-xs leading-relaxed text-muted-foreground line-clamp-2">
             {product.shortDescription}
           </p>
-          <div className="mt-auto pt-2">
-            <span className="inline-flex items-center gap-1.5 rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
+          <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+            <span className="font-display text-base font-bold text-foreground">
+              {formatNaira(product.price)}
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
               <ExternalLink className="h-3 w-3" />
               {buttonLabel}
             </span>
