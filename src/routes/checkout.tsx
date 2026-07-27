@@ -13,6 +13,7 @@ import {
   AlertCircle,
   FileText,
   Info,
+  Globe,
 } from "lucide-react";
 import { useState, useRef } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
@@ -230,6 +231,13 @@ function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
 
+  // International delivery
+  const [intlCountry, setIntlCountry] = useState("");
+  const [intlCity, setIntlCity] = useState("");
+  const [intlAddress, setIntlAddress] = useState("");
+  const [intlPostalCode, setIntlPostalCode] = useState("");
+  const [intlInstructions, setIntlInstructions] = useState("");
+
   // Payment proof
   const [paymentMethod, setPaymentMethod] = useState<"paystack" | "manual">("paystack");
   const [proofFile, setProofFile] = useState<File | null>(null);
@@ -350,7 +358,9 @@ function CheckoutPage() {
       ? !!selectedConference && (!useDelegate || (delegateName && delegatePhone && delegateRelationship))
       : fulfillmentMethod === "wholeness-pickup"
         ? !useDelegate || (delegateName && delegatePhone && delegateRelationship)
-        : deliveryName && deliveryPhone && deliveryState && deliveryCity && deliveryAddress;
+        : fulfillmentMethod === "international-delivery"
+          ? deliveryName && deliveryPhone && intlCountry && intlCity && intlAddress
+          : deliveryName && deliveryPhone && deliveryState && deliveryCity && deliveryAddress;
   const canProceedPayment = paymentMethod === "paystack" || (proofFile && proofAmount && proofDate);
   const canSubmit = canProceedCustomer && canProceedFulfillment && canProceedPayment;
 
@@ -423,7 +433,18 @@ function CheckoutPage() {
               address: deliveryAddress,
               instructions: deliveryInstructions,
             }
-          : undefined,
+          : fulfillmentMethod === "international-delivery"
+            ? {
+                recipientName: deliveryName,
+                phone: deliveryPhone,
+                state: "",
+                city: intlCity,
+                address: intlAddress,
+                instructions: intlInstructions,
+                country: intlCountry,
+                postalCode: intlPostalCode,
+              }
+            : undefined,
       paymentProof:
         paymentMethod === "manual" && proofFile
           ? {
@@ -591,7 +612,7 @@ function CheckoutPage() {
                   </p>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {(
                     [
                       {
@@ -611,6 +632,12 @@ function CheckoutPage() {
                         icon: Truck,
                         title: "Nationwide Delivery",
                         desc: "Delivered to your location",
+                      },
+                      {
+                        key: "international-delivery" as const,
+                        icon: Globe,
+                        title: "International Delivery",
+                        desc: "Shipped outside Nigeria",
                       },
                     ] as const
                   ).map(({ key, icon: Icon, title, desc }) => (
@@ -834,6 +861,102 @@ function CheckoutPage() {
                       Delivery fee will be calculated by the Secretariat or
                       based on predefined shipping zones and added to your total
                       before payment.
+                    </div>
+                  </div>
+                )}
+
+                {/* International delivery */}
+                {fulfillmentMethod === "international-delivery" && (
+                  <div className="mt-4 space-y-4 rounded-2xl border border-border/60 bg-card p-6">
+                    <p className="font-display text-lg font-bold text-foreground">
+                      International Delivery Information
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div className="sm:col-span-2">
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Full Name *
+                        </label>
+                        <input
+                          value={deliveryName}
+                          onChange={(e) => setDeliveryName(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          placeholder="Recipient's full name"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Phone Number *
+                        </label>
+                        <input
+                          value={deliveryPhone}
+                          onChange={(e) => setDeliveryPhone(e.target.value)}
+                          type="tel"
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          placeholder="+1 234 567 8900"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Country *
+                        </label>
+                        <input
+                          value={intlCountry}
+                          onChange={(e) => setIntlCountry(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          placeholder="e.g. United Kingdom, Ghana, USA"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          City *
+                        </label>
+                        <input
+                          value={intlCity}
+                          onChange={(e) => setIntlCity(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          placeholder="City"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Postal / ZIP Code
+                        </label>
+                        <input
+                          value={intlPostalCode}
+                          onChange={(e) => setIntlPostalCode(e.target.value)}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          placeholder="Postal code"
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Complete Address *
+                        </label>
+                        <textarea
+                          value={intlAddress}
+                          onChange={(e) => setIntlAddress(e.target.value)}
+                          rows={3}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none resize-none"
+                          placeholder="Street address, apartment, landmark..."
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                          Delivery Instructions
+                        </label>
+                        <textarea
+                          value={intlInstructions}
+                          onChange={(e) => setIntlInstructions(e.target.value)}
+                          rows={2}
+                          className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none resize-none"
+                          placeholder="Any special delivery instructions..."
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 rounded-xl bg-secondary/60 p-3 text-xs text-muted-foreground">
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                      International shipping fees will be calculated by the
+                      Secretariat and communicated before payment.
                     </div>
                   </div>
                 )}
@@ -1212,6 +1335,13 @@ function CheckoutPage() {
                         <p>
                           {deliveryAddress}, {deliveryCity}, {deliveryState}
                         </p>
+                      </div>
+                    )}
+                    {fulfillmentMethod === "international-delivery" && (
+                      <div className="mt-1 space-y-0.5 text-muted-foreground">
+                        <p>{deliveryName}</p>
+                        <p>{intlAddress}</p>
+                        <p>{intlCity}{intlPostalCode ? `, ${intlPostalCode}` : ""}, {intlCountry}</p>
                       </div>
                     )}
                   </div>

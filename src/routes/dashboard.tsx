@@ -192,7 +192,8 @@ function DashboardPage() {
                     <p>
                       {selectedOrder.delivery.address},{" "}
                       {selectedOrder.delivery.city},{" "}
-                      {selectedOrder.delivery.state}
+                      {selectedOrder.delivery.country || selectedOrder.delivery.state}
+                      {selectedOrder.delivery.postalCode ? ` ${selectedOrder.delivery.postalCode}` : ""}
                     </p>
                   </div>
                 )}

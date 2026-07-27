@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
-export type FulfillmentMethod = "conference-pickup" | "wholeness-pickup" | "delivery";
+export type FulfillmentMethod = "conference-pickup" | "wholeness-pickup" | "delivery" | "international-delivery";
 
 export type OrderStatus =
   | "awaiting-payment"
@@ -61,6 +61,8 @@ export type DeliveryInfo = {
   city: string;
   address: string;
   instructions: string;
+  country?: string;
+  postalCode?: string;
 };
 
 export type PaymentProof = {

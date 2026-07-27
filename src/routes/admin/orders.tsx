@@ -53,7 +53,7 @@ function AdminOrders() {
         o.fulfillmentMethod === "conference-pickup" ||
         o.fulfillmentMethod === "wholeness-pickup"
       );
-    if (filterTab === "delivery") return o.fulfillmentMethod === "delivery";
+    if (filterTab === "delivery") return o.fulfillmentMethod === "delivery" || o.fulfillmentMethod === "international-delivery";
     if (filterTab === "completed")
       return ["completed", "delivered"].includes(o.status);
     return true;
@@ -95,7 +95,7 @@ function AdminOrders() {
     {
       key: "delivery",
       label: "Delivery Orders",
-      count: orders.filter((o) => o.fulfillmentMethod === "delivery").length,
+      count: orders.filter((o) => o.fulfillmentMethod === "delivery" || o.fulfillmentMethod === "international-delivery").length,
     },
     {
       key: "completed",
@@ -368,7 +368,8 @@ function AdminOrders() {
                     <p>
                       {selectedOrder.delivery.address},{" "}
                       {selectedOrder.delivery.city},{" "}
-                      {selectedOrder.delivery.state}
+                      {selectedOrder.delivery.country || selectedOrder.delivery.state}
+                      {selectedOrder.delivery.postalCode ? ` ${selectedOrder.delivery.postalCode}` : ""}
                     </p>
                     {selectedOrder.delivery.instructions && (
                       <p className="italic">

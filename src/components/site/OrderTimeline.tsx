@@ -42,12 +42,13 @@ export function OrderTimeline({ order }: { order: Order }) {
           return null;
         if (
           status === "ready-for-delivery" &&
-          order.fulfillmentMethod !== "delivery"
+          order.fulfillmentMethod !== "delivery" &&
+          order.fulfillmentMethod !== "international-delivery"
         )
           return null;
-        if (status === "shipped" && order.fulfillmentMethod !== "delivery")
+        if (status === "shipped" && order.fulfillmentMethod !== "delivery" && order.fulfillmentMethod !== "international-delivery")
           return null;
-        if (status === "delivered" && order.fulfillmentMethod !== "delivery")
+        if (status === "delivered" && order.fulfillmentMethod !== "delivery" && order.fulfillmentMethod !== "international-delivery")
           return null;
 
         const timelineEntry = order.timeline.find((t) => t.status === status);
