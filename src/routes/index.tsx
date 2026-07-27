@@ -22,6 +22,7 @@ function Index() {
   const allProducts = useProducts();
   const featured = allProducts.filter((p) => p.featured);
   const publications = allProducts.filter((p) => p.category === "Publications");
+  const apparel = allProducts.filter((p) => p.category === "Apparel");
 
   return (
     <SiteLayout>
@@ -175,7 +176,7 @@ function Index() {
         </div>
       </section>
 
-      {/* Featured products */}
+      {/* Featured — Apparel */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -183,18 +184,19 @@ function Index() {
               Featured
             </p>
             <h2 className="mt-3 text-3xl font-bold text-foreground sm:text-4xl">
-              This season&apos;s essentials
+              Apparel essentials
             </h2>
             <p className="mt-2 max-w-md text-sm text-muted-foreground">
-              Handpicked items our community loves — from conference-ready
-              apparel to meaningful publications.
+              Conference-ready gear and everyday wear designed for the CMDA
+              community.
             </p>
           </div>
           <Link
             to="/shop"
+            search={{ category: "Apparel" } as never}
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
           >
-            View all merchandise <ArrowRight className="h-4 w-4" />
+            View all apparel <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger">
@@ -204,33 +206,27 @@ function Index() {
         </div>
       </section>
 
-      {/* Publications banner */}
+      {/* Publications — Full dedicated section */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-primary/[0.04] via-background to-brand-green/[0.04]">
-          <div className="grid items-center gap-0 md:grid-cols-[1fr_1.3fr]">
-            {/* Left: copy */}
-            <div className="p-8 sm:p-12 lg:p-14">
-              <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
-                <BookOpen className="h-3.5 w-3.5" />
-                Publications
-              </div>
-              <h2 className="mt-6 text-2xl font-bold text-foreground sm:text-3xl lg:text-4xl">
-                Stories, teaching, and the mark of our identity.
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                From the flagship Wholeness Magazine to the Logo Exploration
-                Handbook — publications that carry the story of CMDA Nigeria.
-              </p>
-              <Link
-                to="/shop"
-                search={{ category: "Publications" } as never}
-                className="mt-8 inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3.5 text-sm font-semibold text-background transition-all hover:-translate-y-0.5 hover:shadow-lg"
-              >
-                Explore publications <ArrowRight className="h-4 w-4" />
-              </Link>
+        <div className="overflow-hidden rounded-3xl border border-border/40 bg-gradient-to-br from-primary/[0.03] via-background to-brand-green/[0.03]">
+          {/* Top: header */}
+          <div className="px-8 pt-10 sm:px-14 sm:pt-12">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
+              <BookOpen className="h-3.5 w-3.5" />
+              Publications
             </div>
-            {/* Right: publication cards */}
-            <div className="grid grid-cols-2 gap-4 p-6 sm:p-8 lg:p-10">
+            <h2 className="mt-5 text-2xl font-bold text-foreground sm:text-3xl">
+              Stories, teaching, and the mark of our identity.
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
+              From the flagship Wholeness Magazine to the Logo Exploration
+              Handbook — publications that carry the story of CMDA Nigeria.
+            </p>
+          </div>
+
+          {/* Products grid */}
+          <div className="px-8 pb-4 sm:px-14 sm:pb-6">
+            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
               {publications.map((p) => (
                 <ProductCard key={p.id} product={p} />
               ))}
@@ -245,6 +241,20 @@ function Index() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <div className="flex flex-wrap items-center justify-between gap-4 border-t border-border/40 px-8 py-5 sm:px-14">
+            <p className="text-sm text-muted-foreground">
+              More publications coming soon — check back regularly.
+            </p>
+            <Link
+              to="/shop"
+              search={{ category: "Publications" } as never}
+              className="inline-flex items-center gap-2 rounded-xl bg-foreground px-6 py-3 text-sm font-semibold text-background transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Browse all publications <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
