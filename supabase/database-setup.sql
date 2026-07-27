@@ -64,3 +64,10 @@ CREATE POLICY "Allow all on orders" ON orders FOR ALL USING (true) WITH CHECK (t
 -- ============================================================
 CREATE INDEX IF NOT EXISTS idx_orders_order_number ON orders (order_number);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
+
+-- ============================================================
+-- MIGRATION: Add external URL columns to products
+-- Run once if table already exists without these columns.
+-- ============================================================
+ALTER TABLE products ADD COLUMN IF NOT EXISTS external_url TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS external_url_label TEXT;

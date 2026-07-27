@@ -225,6 +225,7 @@ function CheckoutPage() {
   const [deliveryInstructions, setDeliveryInstructions] = useState("");
 
   // Payment proof
+  const [paymentMethod, setPaymentMethod] = useState<"paystack" | "manual">("paystack");
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string>("");
   const [proofAmount, setProofAmount] = useState("");
@@ -342,7 +343,7 @@ function CheckoutPage() {
       : fulfillmentMethod === "wholeness-pickup"
         ? !useDelegate || (delegateName && delegatePhone && delegateRelationship)
         : deliveryName && deliveryPhone && deliveryState && deliveryCity && deliveryAddress;
-  const canProceedPayment = proofFile && proofAmount && proofDate;
+  const canProceedPayment = paymentMethod === "paystack" || (proofFile && proofAmount && proofDate);
   const canSubmit = canProceedCustomer && canProceedFulfillment && canProceedPayment;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -415,15 +416,24 @@ function CheckoutPage() {
               instructions: deliveryInstructions,
             }
           : undefined,
-      paymentProof: proofFile
-        ? {
-            fileName: proofFile.name,
-            fileDataUrl: proofPreview,
-            amountPaid: Number(proofAmount),
-            paymentDate: proofDate,
-            paymentReference: proofReference,
-          }
-        : undefined,
+      paymentProof:
+        paymentMethod === "manual" && proofFile
+          ? {
+              fileName: proofFile.name,
+              fileDataUrl: proofPreview,
+              amountPaid: Number(proofAmount),
+              paymentDate: proofDate,
+              paymentReference: proofReference,
+            }
+          : paymentMethod === "paystack"
+            ? {
+                fileName: "paystack-payment",
+                fileDataUrl: "",
+                amountPaid: grandTotal,
+                paymentDate: new Date().toISOString().slice(0, 10),
+                paymentReference: "Paid via Paystack",
+              }
+            : undefined,
       subtotal,
       deliveryFee,
       grandTotal,
@@ -843,154 +853,252 @@ function CheckoutPage() {
               <div className="space-y-6">
                 <div>
                   <h2 className="font-display text-2xl font-bold text-foreground">
-                    Manual Payment
+                    Payment
                   </h2>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Transfer the total amount to the account below, then upload
-                    your payment proof.
+                    Choose how you'd like to pay for your order.
                   </p>
                 </div>
 
-                {/* OPay Account Card */}
-                <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
-                  <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
-                    <p className="text-sm font-medium text-primary-foreground/80">
-                      Transfer to this account
-                    </p>
-                    <p className="mt-1 font-display text-2xl font-bold text-primary-foreground">
-                      {formatNaira(grandTotal)}
-                    </p>
-                  </div>
-                  <div className="space-y-4 p-6">
-                    <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          Account Name
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          Christian Medical and Dental Association of Nigeria
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          Account Number
-                        </p>
-                        <p className="font-display text-xl font-bold tracking-wider text-foreground">
-                          6576866256
-                        </p>
-                      </div>
-                      <button
-                        onClick={copyAccountNumber}
-                        className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                      >
-                        {copied ? (
-                          <>
-                            <Check className="h-3 w-3" /> Copied
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-3 w-3" /> Copy
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
-                      <div>
-                        <p className="text-xs text-muted-foreground">Bank</p>
-                        <p className="font-semibold text-foreground">OPay</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Payment Proof Upload */}
-                <div className="rounded-2xl border border-border/60 bg-card p-6">
-                  <p className="font-display text-lg font-bold text-foreground">
-                    Upload Payment Proof
-                  </p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Upload a screenshot or receipt of your transfer.
-                  </p>
-
-                  <div className="mt-4">
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".jpg,.jpeg,.png,.pdf"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border p-6 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-                    >
-                      {proofFile ? (
-                        <>
-                          <Check className="h-5 w-5 text-brand-green" />
-                          <span className="text-sm font-medium">
-                            {proofFile.name}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-5 w-5" />
-                          <span className="text-sm">
-                            Click to upload JPG, PNG, or PDF
-                          </span>
-                        </>
-                      )}
-                    </button>
-                    {proofPreview && (
-                      <div className="mt-3 overflow-hidden rounded-xl border border-border">
-                        <img
-                          src={proofPreview}
-                          alt="Payment proof"
-                          className="max-h-48 w-full object-contain"
-                        />
-                      </div>
+                {/* Payment method selector */}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <button
+                    onClick={() => setPaymentMethod("paystack")}
+                    className={cn(
+                      "flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all",
+                      paymentMethod === "paystack"
+                        ? "border-primary bg-primary-soft shadow-card"
+                        : "border-border bg-card hover:border-primary/40",
                     )}
-                  </div>
+                  >
+                    <div
+                      className={cn(
+                        "grid h-10 w-10 place-items-center rounded-xl",
+                        paymentMethod === "paystack"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-muted-foreground",
+                      )}
+                    >
+                      <CreditCard className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-display text-lg font-bold text-foreground">
+                        Pay with Paystack
+                      </p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        Card, bank transfer, USSD — instant verification
+                      </p>
+                    </div>
+                  </button>
 
-                  <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                        Amount Paid *
-                      </label>
-                      <input
-                        value={proofAmount}
-                        onChange={(e) => setProofAmount(e.target.value)}
-                        type="number"
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                        placeholder="Amount in Naira"
-                      />
+                  <button
+                    onClick={() => setPaymentMethod("manual")}
+                    className={cn(
+                      "flex flex-col items-start gap-3 rounded-2xl border-2 p-5 text-left transition-all",
+                      paymentMethod === "manual"
+                        ? "border-primary bg-primary-soft shadow-card"
+                        : "border-border bg-card hover:border-primary/40",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "grid h-10 w-10 place-items-center rounded-xl",
+                        paymentMethod === "manual"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-secondary text-muted-foreground",
+                      )}
+                    >
+                      <Upload className="h-5 w-5" />
                     </div>
                     <div>
-                      <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                        Payment Date *
-                      </label>
-                      <input
-                        value={proofDate}
-                        onChange={(e) => setProofDate(e.target.value)}
-                        type="date"
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                      />
+                      <p className="font-display text-lg font-bold text-foreground">
+                        Manual Transfer
+                      </p>
+                      <p className="mt-0.5 text-sm text-muted-foreground">
+                        Bank transfer + upload payment receipt
+                      </p>
                     </div>
-                    <div className="sm:col-span-2">
-                      <label className="mb-1.5 block text-sm font-semibold text-foreground">
-                        Payment Reference{" "}
-                        <span className="text-muted-foreground">(Optional)</span>
-                      </label>
-                      <input
-                        value={proofReference}
-                        onChange={(e) => setProofReference(e.target.value)}
-                        className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
-                        placeholder="Transaction reference or narration"
-                      />
-                    </div>
-                  </div>
+                  </button>
                 </div>
+
+                {/* Paystack option */}
+                {paymentMethod === "paystack" && (
+                  <div className="space-y-4">
+                    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
+                      <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
+                        <p className="text-sm font-medium text-primary-foreground/80">
+                          Total to pay
+                        </p>
+                        <p className="mt-1 font-display text-2xl font-bold text-primary-foreground">
+                          {formatNaira(grandTotal)}
+                        </p>
+                      </div>
+                      <div className="p-6">
+                        <p className="text-sm text-muted-foreground">
+                          Click the button below to pay securely via Paystack. You can pay with debit card, bank transfer, USSD, or other methods.
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href="https://paystack.shop/pay/cmda-merch"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground shadow-elegant transition-all hover:shadow-lg hover:-translate-y-0.5"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Pay {formatNaira(grandTotal)} with Paystack
+                    </a>
+                    <p className="text-center text-xs text-muted-foreground">
+                      After payment, return here and click "Submit Order" to complete your order.
+                    </p>
+                  </div>
+                )}
+
+                {/* Manual transfer option */}
+                {paymentMethod === "manual" && (
+                  <>
+                    {/* OPay Account Card */}
+                    <div className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card">
+                      <div className="bg-gradient-to-r from-primary to-primary/80 px-6 py-5">
+                        <p className="text-sm font-medium text-primary-foreground/80">
+                          Transfer to this account
+                        </p>
+                        <p className="mt-1 font-display text-2xl font-bold text-primary-foreground">
+                          {formatNaira(grandTotal)}
+                        </p>
+                      </div>
+                      <div className="space-y-4 p-6">
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground">
+                              Account Name
+                            </p>
+                            <p className="font-semibold text-foreground">
+                              Christian Medical and Dental Association of Nigeria
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground">
+                              Account Number
+                            </p>
+                            <p className="font-display text-xl font-bold tracking-wider text-foreground">
+                              6576866256
+                            </p>
+                          </div>
+                          <button
+                            onClick={copyAccountNumber}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                          >
+                            {copied ? (
+                              <>
+                                <Check className="h-3 w-3" /> Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3 w-3" /> Copy
+                              </>
+                            )}
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-4 py-3">
+                          <div>
+                            <p className="text-xs text-muted-foreground">Bank</p>
+                            <p className="font-semibold text-foreground">OPay</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Payment Proof Upload */}
+                    <div className="rounded-2xl border border-border/60 bg-card p-6">
+                      <p className="font-display text-lg font-bold text-foreground">
+                        Upload Payment Proof
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Upload a screenshot or receipt of your transfer.
+                      </p>
+
+                      <div className="mt-4">
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept=".jpg,.jpeg,.png,.pdf"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <button
+                          onClick={() => fileInputRef.current?.click()}
+                          className="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border p-6 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                        >
+                          {proofFile ? (
+                            <>
+                              <Check className="h-5 w-5 text-brand-green" />
+                              <span className="text-sm font-medium">
+                                {proofFile.name}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <Upload className="h-5 w-5" />
+                              <span className="text-sm">
+                                Click to upload JPG, PNG, or PDF
+                              </span>
+                            </>
+                          )}
+                        </button>
+                        {proofPreview && (
+                          <div className="mt-3 overflow-hidden rounded-xl border border-border">
+                            <img
+                              src={proofPreview}
+                              alt="Payment proof"
+                              className="max-h-48 w-full object-contain"
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        <div>
+                          <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                            Amount Paid *
+                          </label>
+                          <input
+                            value={proofAmount}
+                            onChange={(e) => setProofAmount(e.target.value)}
+                            type="number"
+                            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                            placeholder="Amount in Naira"
+                          />
+                        </div>
+                        <div>
+                          <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                            Payment Date *
+                          </label>
+                          <input
+                            value={proofDate}
+                            onChange={(e) => setProofDate(e.target.value)}
+                            type="date"
+                            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                          />
+                        </div>
+                        <div className="sm:col-span-2">
+                          <label className="mb-1.5 block text-sm font-semibold text-foreground">
+                            Payment Reference{" "}
+                            <span className="text-muted-foreground">(Optional)</span>
+                          </label>
+                          <input
+                            value={proofReference}
+                            onChange={(e) => setProofReference(e.target.value)}
+                            className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                            placeholder="Transaction reference or narration"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 <div className="flex gap-3">
                   <button

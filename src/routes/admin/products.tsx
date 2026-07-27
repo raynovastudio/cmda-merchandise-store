@@ -26,6 +26,8 @@ type FormState = {
   sizes: string[];
   colors: ProductColor[];
   image: string;
+  externalUrl: string;
+  externalUrlLabel: string;
 };
 
 const emptyForm: FormState = {
@@ -38,6 +40,8 @@ const emptyForm: FormState = {
   sizes: [],
   colors: [],
   image: "",
+  externalUrl: "",
+  externalUrlLabel: "",
 };
 
 function RowImage({ product }: { product: Product }) {
@@ -93,6 +97,8 @@ function AdminProducts() {
       sizes: product.sizes ?? [],
       colors: product.colors ?? [],
       image: remoteImg || product.image,
+      externalUrl: product.externalUrl ?? "",
+      externalUrlLabel: product.externalUrlLabel ?? "",
     });
     setShowAddModal(true);
   };
@@ -120,6 +126,8 @@ function AdminProducts() {
         description: form.description,
         sizes: form.sizes.length > 0 ? form.sizes : null,
         colors: form.colors.length > 0 ? form.colors : null,
+        externalUrl: form.externalUrl || undefined,
+        externalUrlLabel: form.externalUrlLabel || undefined,
       });
     } else {
       const newProduct: Product = {
@@ -133,6 +141,8 @@ function AdminProducts() {
         sizes: form.sizes.length > 0 ? form.sizes : null,
         colors: form.colors.length > 0 ? form.colors : null,
         availability: form.availability,
+        externalUrl: form.externalUrl || undefined,
+        externalUrlLabel: form.externalUrlLabel || undefined,
       };
       await addProduct(newProduct);
       if (form.image) {
@@ -508,6 +518,44 @@ function AdminProducts() {
                   rows={3}
                   className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
                 />
+              </div>
+
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <p className="mb-3 text-sm font-medium text-gray-900">
+                  External Link <span className="text-gray-400">(Optional)</span>
+                </p>
+                <p className="mb-3 text-xs text-gray-500">
+                  If set, this product will show a button linking to an external URL (e.g. Google Form) instead of "Add to cart".
+                </p>
+                <div className="space-y-3">
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-gray-700">
+                      URL
+                    </label>
+                    <input
+                      value={form.externalUrl}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, externalUrl: e.target.value }))
+                      }
+                      type="url"
+                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
+                      placeholder="https://forms.gle/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-gray-700">
+                      Button Label
+                    </label>
+                    <input
+                      value={form.externalUrlLabel}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, externalUrlLabel: e.target.value }))
+                      }
+                      className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[oklch(0.38_0.15_335)] focus:outline-none"
+                      placeholder="e.g. Fill Form, Register, Pre-order"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div className="flex justify-end gap-3 pt-2">

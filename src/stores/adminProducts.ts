@@ -15,6 +15,8 @@ type ProductRow = {
   colors: ProductColor[] | null;
   availability: string;
   is_custom: boolean;
+  external_url: string | null;
+  external_url_label: string | null;
   created_at: string;
 };
 
@@ -30,6 +32,8 @@ function rowToProduct(row: ProductRow): Product {
     sizes: row.sizes ?? null,
     colors: row.colors ?? null,
     availability: (row.availability as Availability) ?? "in-stock",
+    externalUrl: row.external_url ?? undefined,
+    externalUrlLabel: row.external_url_label ?? undefined,
   };
 }
 
@@ -46,6 +50,8 @@ function productToRow(product: Product, isCustom: boolean): Omit<ProductRow, "cr
     colors: product.colors ?? null,
     availability: product.availability,
     is_custom: isCustom,
+    external_url: product.externalUrl ?? null,
+    external_url_label: product.externalUrlLabel ?? null,
   };
 }
 

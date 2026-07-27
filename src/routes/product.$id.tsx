@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
-import { ArrowLeft, Check, Minus, Plus, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Check, Minus, Plus, ShoppingBag, ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
@@ -230,42 +230,61 @@ function ProductPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <button
-              onClick={handleAdd}
-              disabled={!canAdd}
-              className={cn(
-                "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-60",
-                added
-                  ? "bg-brand-green text-white shadow-sm"
-                  : "bg-primary text-primary-foreground shadow-elegant hover:shadow-lg hover:-translate-y-0.5",
-              )}
-            >
-              {added ? (
-                <>
-                  <Check className="h-4 w-4" /> Added to cart
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="h-4 w-4" /> Add to cart
-                </>
-              )}
-            </button>
-            <Link
-              to="/cart"
-              className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-card px-6 py-4 text-sm font-semibold text-foreground shadow-card transition-all hover:shadow-card-hover hover:-translate-y-0.5"
-            >
-              View cart
-            </Link>
-          </div>
+          {product.externalUrl ? (
+            <div className="mt-8 flex flex-col gap-3">
+              <a
+                href={product.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 text-sm font-semibold text-primary-foreground shadow-elegant transition-all hover:shadow-lg hover:-translate-y-0.5"
+              >
+                <ExternalLink className="h-4 w-4" />
+                {product.externalUrlLabel || "Learn More"}
+              </a>
+              <p className="text-xs text-muted-foreground text-center">
+                Opens in a new tab
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <button
+                  onClick={handleAdd}
+                  disabled={!canAdd}
+                  className={cn(
+                    "inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-60",
+                    added
+                      ? "bg-brand-green text-white shadow-sm"
+                      : "bg-primary text-primary-foreground shadow-elegant hover:shadow-lg hover:-translate-y-0.5",
+                  )}
+                >
+                  {added ? (
+                    <>
+                      <Check className="h-4 w-4" /> Added to cart
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="h-4 w-4" /> Add to cart
+                    </>
+                  )}
+                </button>
+                <Link
+                  to="/cart"
+                  className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-card px-6 py-4 text-sm font-semibold text-foreground shadow-card transition-all hover:shadow-card-hover hover:-translate-y-0.5"
+                >
+                  View cart
+                </Link>
+              </div>
 
-          {(!canAdd) && (
-            <p className="mt-3 text-xs text-muted-foreground">
-              {!needsSize && needsColor && !color && "Select a color to add this product to your cart."}
-              {needsSize && !size && !needsColor && "Select a size to add this product to your cart."}
-              {needsSize && !size && needsColor && !color && "Select a size and color to add this product to your cart."}
-              {needsSize && size && needsColor && !color && "Select a color to add this product to your cart."}
-            </p>
+              {(!canAdd) && (
+                <p className="mt-3 text-xs text-muted-foreground">
+                  {!needsSize && needsColor && !color && "Select a color to add this product to your cart."}
+                  {needsSize && !size && !needsColor && "Select a size to add this product to your cart."}
+                  {needsSize && !size && needsColor && !color && "Select a size and color to add this product to your cart."}
+                  {needsSize && size && needsColor && !color && "Select a color to add this product to your cart."}
+                </p>
+              )}
+            </>
           )}
 
           <div className="mt-10 grid grid-cols-2 gap-4 rounded-2xl bg-secondary/60 p-5 text-sm">

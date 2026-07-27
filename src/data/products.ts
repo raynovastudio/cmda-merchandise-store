@@ -19,6 +19,8 @@ export type Product = {
   featured?: boolean;
   isNew?: boolean;
   bestSeller?: boolean;
+  externalUrl?: string;
+  externalUrlLabel?: string;
 };
 
 const APPAREL_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
