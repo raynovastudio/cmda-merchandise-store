@@ -150,7 +150,7 @@ function ShopPage() {
           </div>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger">
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 stagger">
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

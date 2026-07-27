@@ -308,7 +308,7 @@ function ProductPage() {
 
       <section className="mx-auto max-w-7xl px-4 pb-28 sm:px-6 lg:px-8">
         <h2 className="mb-8 text-3xl font-bold text-foreground">You may also like</h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 stagger">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 stagger">
           {related.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
