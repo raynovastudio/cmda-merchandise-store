@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { conferences as baseConferences, type Conference } from "@/data/conferences";
+import { type Conference } from "@/data/conferences";
 import { supabase } from "@/lib/supabase";
 
 type ConferencesState = {
@@ -13,7 +13,7 @@ type ConferencesState = {
 };
 
 export const useConferences = create<ConferencesState>()((set, get) => ({
-  conferences: baseConferences,
+  conferences: [],
   loaded: false,
 
   loadFromSupabase: async () => {
@@ -45,17 +45,6 @@ export const useConferences = create<ConferencesState>()((set, get) => ({
           loaded: true,
         });
       } else {
-        const base = get().conferences;
-        for (const c of base) {
-          await supabase.from("conferences").upsert({
-            id: c.id,
-            name: c.name,
-            location: c.location,
-            date: c.date,
-            end_date: c.endDate,
-            pickup_enabled: c.pickupEnabled,
-          });
-        }
         set({ loaded: true });
       }
     } catch (e) {
