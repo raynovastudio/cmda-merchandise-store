@@ -147,7 +147,7 @@ function DataInitializer() {
   useEffect(() => {
     if (!productsLoaded) useAdminProducts.getState().loadFromSupabase();
     if (!ordersLoaded) useOrders.getState().loadFromSupabase();
-    if (!conferencesLoaded) useConferences.getState().loadFromSupabase();
+    useConferences.getState().loadFromSupabase();
   }, [productsLoaded, ordersLoaded, conferencesLoaded]);
 
   return null;

@@ -18,6 +18,7 @@ export const useConferences = create<ConferencesState>()((set, get) => ({
 
   loadFromSupabase: async () => {
     if (!supabase) {
+      console.warn("[conferences] No Supabase client, using defaults");
       set({ loaded: true });
       return;
     }
@@ -26,7 +27,11 @@ export const useConferences = create<ConferencesState>()((set, get) => ({
         .from("conferences")
         .select("*")
         .order("date", { ascending: true });
-      if (error) throw error;
+      if (error) {
+        console.error("[conferences] Supabase query error:", error.message);
+        throw error;
+      }
+      console.log("[conferences] Loaded from Supabase:", data?.length, "rows");
       if (data && data.length > 0) {
         set({
           conferences: data.map((row) => ({
@@ -40,7 +45,6 @@ export const useConferences = create<ConferencesState>()((set, get) => ({
           loaded: true,
         });
       } else {
-        // No rows yet — seed base conferences
         const base = get().conferences;
         for (const c of base) {
           await supabase.from("conferences").upsert({
@@ -54,7 +58,8 @@ export const useConferences = create<ConferencesState>()((set, get) => ({
         }
         set({ loaded: true });
       }
-    } catch {
+    } catch (e) {
+      console.error("[conferences] loadFromSupabase failed:", e);
       set({ loaded: true });
     }
   },
