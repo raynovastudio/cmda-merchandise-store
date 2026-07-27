@@ -71,11 +71,11 @@ function AdminConferences() {
     setEditingConference(null);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.name || !form.location || !form.date || !form.endDate) return;
 
     if (editingConference) {
-      updateConference(editingConference.id, {
+      await updateConference(editingConference.id, {
         name: form.name,
         location: form.location,
         date: form.date,
@@ -87,7 +87,7 @@ function AdminConferences() {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, "");
-      addConference({
+      await addConference({
         id: `conference-${id}-${Date.now()}`,
         name: form.name,
         location: form.location,
@@ -99,8 +99,8 @@ function AdminConferences() {
     closeModal();
   };
 
-  const handleDelete = (id: string) => {
-    deleteConference(id);
+  const handleDelete = async (id: string) => {
+    await deleteConference(id);
     setDeleteConfirm(null);
   };
 

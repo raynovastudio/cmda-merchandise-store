@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { useAdminProducts } from "@/stores/adminProducts";
 import { useOrders } from "@/stores/orders";
+import { useConferences } from "@/stores/conferences";
 
 function NotFoundComponent() {
   return (
@@ -141,11 +142,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function DataInitializer() {
   const productsLoaded = useAdminProducts((s) => s.loaded);
   const ordersLoaded = useOrders((s) => s.loaded);
+  const conferencesLoaded = useConferences((s) => s.loaded);
 
   useEffect(() => {
     if (!productsLoaded) useAdminProducts.getState().loadFromSupabase();
     if (!ordersLoaded) useOrders.getState().loadFromSupabase();
-  }, [productsLoaded, ordersLoaded]);
+    if (!conferencesLoaded) useConferences.getState().loadFromSupabase();
+  }, [productsLoaded, ordersLoaded, conferencesLoaded]);
 
   return null;
 }

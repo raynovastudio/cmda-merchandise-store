@@ -71,3 +71,19 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON orders (status);
 -- ============================================================
 ALTER TABLE products ADD COLUMN IF NOT EXISTS external_url TEXT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS external_url_label TEXT;
+
+-- ============================================================
+-- CONFERENCES TABLE
+-- Stores pickup conferences/events. Shared across all devices.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS conferences (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  location TEXT NOT NULL DEFAULT '',
+  date TEXT NOT NULL DEFAULT '',
+  end_date TEXT NOT NULL DEFAULT '',
+  pickup_enabled BOOLEAN DEFAULT true
+);
+
+ALTER TABLE conferences ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all on conferences" ON conferences FOR ALL USING (true) WITH CHECK (true);
