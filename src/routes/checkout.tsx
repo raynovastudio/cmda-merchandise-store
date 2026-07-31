@@ -54,6 +54,27 @@ const STEPS: { key: Step; label: string; icon: typeof User }[] = [
   { key: "review", label: "Review", icon: CheckCircle2 },
 ];
 
+function compressImage(dataUrl: string, maxWidth = 800, quality = 0.6): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      if (img.width <= maxWidth) {
+        resolve(dataUrl);
+        return;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.width = maxWidth;
+      canvas.height = (img.height / img.width) * maxWidth;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { resolve(dataUrl); return; }
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", quality));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 function SummaryItem({ item }: { item: CartItem }) {
   const resolved = useResolvedProduct(item.productId);
   if (!resolved) return null;
@@ -247,6 +268,8 @@ function CheckoutPage() {
   const [proofDate, setProofDate] = useState("");
   const [proofReference, setProofReference] = useState("");
   const [copied, setCopied] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const subtotal = useCartSubtotal();
@@ -365,7 +388,7 @@ function CheckoutPage() {
   const canProceedPayment = paymentMethod === "paystack" || (proofFile && proofAmount && proofDate);
   const canSubmit = canProceedCustomer && canProceedFulfillment && canProceedPayment;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     const validTypes = ["image/jpeg", "image/png", "application/pdf"];
@@ -373,7 +396,11 @@ function CheckoutPage() {
     setProofFile(file);
     if (file.type.startsWith("image/")) {
       const reader = new FileReader();
-      reader.onload = (ev) => setProofPreview(ev.target?.result as string);
+      reader.onload = async (ev) => {
+        const raw = ev.target?.result as string;
+        const compressed = await compressImage(raw);
+        setProofPreview(compressed);
+      };
       reader.readAsDataURL(file);
     } else {
       setProofPreview("");
@@ -387,8 +414,11 @@ function CheckoutPage() {
   };
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
-    const order = await addOrder({
+    if (!canSubmit || submitting) return;
+    setSubmitError("");
+    setSubmitting(true);
+    try {
+      const order = await addOrder({
       customerName: fullName,
       customerEmail: email,
       customerPhone: phone,
@@ -471,6 +501,13 @@ function CheckoutPage() {
     setOrderId(order.id);
     clear();
     setSubmitted(true);
+    } catch (err: unknown) {
+      console.error("Order submission failed:", err);
+      const msg = err instanceof Error ? err.message : "Failed to place order. Please try again.";
+      setSubmitError(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const stepIndex = STEPS.findIndex((s) => s.key === step);
@@ -1389,12 +1426,17 @@ function CheckoutPage() {
                   </button>
                   <button
                     onClick={handleSubmit}
-                    disabled={!canSubmit}
+                    disabled={!canSubmit || submitting}
                     className="inline-flex items-center gap-2 rounded-xl bg-brand-green px-8 py-3.5 text-sm font-semibold text-white shadow-elegant transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    <Check className="h-4 w-4" /> Submit Order
+                    <Check className="h-4 w-4" /> {submitting ? "Placing Order..." : "Submit Order"}
                   </button>
                 </div>
+                {submitError && (
+                  <p className="mt-3 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                    {submitError}
+                  </p>
+                )}
               </div>
             )}
           </div>
