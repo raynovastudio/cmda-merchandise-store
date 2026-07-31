@@ -7,6 +7,7 @@ import {
   XCircle,
   QrCode,
   Printer,
+  RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
 import {
@@ -28,6 +29,8 @@ type FilterTab = "all" | "awaiting-payment" | "payment-submitted" | "pickup" | "
 function AdminOrders() {
   const orders = useOrders((s) => s.orders);
   const updateOrderStatus = useOrders((s) => s.updateOrderStatus);
+  const loading = useOrders((s) => s.loading);
+  const loadFromSupabase = useOrders((s) => s.loadFromSupabase);
   const [search, setSearch] = useState("");
   const [filterTab, setFilterTab] = useState<FilterTab>("all");
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -485,12 +488,22 @@ function AdminOrders() {
             Manage and fulfill customer orders.
           </p>
         </div>
-        <button
-          onClick={exportCSV}
-          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
-        >
-          <Download className="h-4 w-4" /> Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={exportCSV}
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700"
+          >
+            <Download className="h-4 w-4" /> Export CSV
+          </button>
+          <button
+            onClick={() => loadFromSupabase()}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Search */}

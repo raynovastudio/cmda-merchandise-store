@@ -6,6 +6,7 @@ import {
   Clock,
   TrendingUp,
   Users,
+  RefreshCw,
 } from "lucide-react";
 import { useOrders } from "@/stores/orders";
 import { formatNaira } from "@/data/products";
@@ -17,6 +18,8 @@ export const Route = createFileRoute("/admin/")({
 
 function AdminDashboard() {
   const orders = useOrders((s) => s.orders);
+  const loading = useOrders((s) => s.loading);
+  const loadFromSupabase = useOrders((s) => s.loadFromSupabase);
 
   const totalRevenue = orders.reduce((sum, o) => sum + o.grandTotal, 0);
   const pendingOrders = orders.filter(
@@ -66,13 +69,23 @@ function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-3xl font-bold text-gray-900">
-          Dashboard Overview
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Welcome to the CMDA Nigeria store admin panel.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="font-display text-3xl font-bold text-gray-900">
+            Dashboard Overview
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Welcome to the CMDA Nigeria store admin panel.
+          </p>
+        </div>
+        <button
+          onClick={() => loadFromSupabase()}
+          disabled={loading}
+          className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-50"
+        >
+          <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          Refresh
+        </button>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -141,14 +141,29 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function DataInitializer() {
   const productsLoaded = useAdminProducts((s) => s.loaded);
-  const ordersLoaded = useOrders((s) => s.loaded);
   const conferencesLoaded = useConferences((s) => s.loaded);
 
   useEffect(() => {
     if (!productsLoaded) useAdminProducts.getState().loadFromSupabase();
-    if (!ordersLoaded) useOrders.getState().loadFromSupabase();
+    useOrders.getState().loadFromSupabase();
     useConferences.getState().loadFromSupabase();
-  }, [productsLoaded, ordersLoaded, conferencesLoaded]);
+
+    const interval = setInterval(() => {
+      useOrders.getState().loadFromSupabase();
+    }, 30_000);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        useOrders.getState().loadFromSupabase();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [productsLoaded, conferencesLoaded]);
 
   return null;
 }
