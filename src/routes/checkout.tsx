@@ -28,7 +28,7 @@ import {
 import { nigerianStates } from "@/data/conferences";
 import { useConferences } from "@/stores/conferences";
 import { cn } from "@/lib/utils";
-import { getProductImage, resolveProduct, useResolvedProduct } from "@/stores/adminProducts";
+import { getProductImage, resolveProduct, getEffectivePrice, useResolvedProduct } from "@/stores/adminProducts";
 
 function calculatePaystackFee(amount: number): number {
   if (amount <= 2500) return 0;
@@ -58,6 +58,7 @@ function SummaryItem({ item }: { item: CartItem }) {
   const resolved = useResolvedProduct(item.productId);
   if (!resolved) return null;
   const { product: p, image } = resolved;
+  const unitPrice = getEffectivePrice(item.productId, item.quantity);
   return (
     <li className="flex items-center gap-3 text-sm">
       <img src={image} alt={p.name} className="h-12 w-12 rounded-lg object-cover" />
@@ -70,7 +71,7 @@ function SummaryItem({ item }: { item: CartItem }) {
           × {item.quantity}
         </p>
       </div>
-      <p className="font-semibold text-foreground">{formatNaira(p.price * item.quantity)}</p>
+      <p className="font-semibold text-foreground">{formatNaira(unitPrice * item.quantity)}</p>
     </li>
   );
 }
@@ -397,7 +398,7 @@ function CheckoutPage() {
         return {
           productId: item.productId,
           name: p.name,
-          price: p.price,
+          price: getEffectivePrice(item.productId, item.quantity),
           size: item.size,
           color: item.color,
           quantity: item.quantity,

@@ -89,7 +89,7 @@ export const products: Product[] = [
     id: "wholeness-magazine",
     name: "Wholeness Magazine",
     category: "Publications",
-    price: 3000,
+    price: 4500,
     image: "",
     shortDescription:
       "The flagship CMDA Nigeria magazine — stories, teaching, and mission dispatches.",

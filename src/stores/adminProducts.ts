@@ -240,6 +240,18 @@ export function resolveProduct(id: string): Product | undefined {
   return getAllProducts().find((p) => p.id === id);
 }
 
+const BULK_DISCOUNTS: Record<string, { threshold: number; discountedPrice: number }> = {
+  "wholeness-magazine": { threshold: 10, discountedPrice: 4000 },
+};
+
+export function getEffectivePrice(productId: string, quantity: number): number {
+  const product = resolveProduct(productId);
+  if (!product) return 0;
+  const rule = BULK_DISCOUNTS[productId];
+  if (rule && quantity >= rule.threshold) return rule.discountedPrice;
+  return product.price;
+}
+
 export function useResolvedProduct(id: string): { product: Product; image: string } | undefined {
   const products = useProducts();
   const remoteProducts = useAdminProducts((s) => s.remoteProducts);

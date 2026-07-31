@@ -5,7 +5,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { AvailabilityBadge } from "@/components/site/AvailabilityBadge";
 import { formatNaira } from "@/data/products";
 import { useCart, useCartSubtotal, type CartItem } from "@/stores/cart";
-import { useResolvedProduct } from "@/stores/adminProducts";
+import { useResolvedProduct, getEffectivePrice } from "@/stores/adminProducts";
 
 export const Route = createFileRoute("/cart")({
   head: () => ({
@@ -30,6 +30,8 @@ function CartItemRow({
   const resolved = useResolvedProduct(item.productId);
   if (!resolved) return null;
   const { product: p, image } = resolved;
+  const unitPrice = getEffectivePrice(item.productId, item.quantity);
+  const hasDiscount = unitPrice < p.price;
 
   return (
     <li className="grid grid-cols-[96px_1fr] gap-4 rounded-2xl border border-border/50 bg-card p-4 shadow-card sm:grid-cols-[120px_1fr_auto] sm:gap-6 sm:p-5">
@@ -65,9 +67,16 @@ function CartItemRow({
               <AvailabilityBadge availability={p.availability} />
             </div>
           </div>
-          <p className="font-display text-base font-bold text-foreground">
-            {formatNaira(p.price * item.quantity)}
-          </p>
+          <div className="text-right">
+            <p className="font-display text-base font-bold text-foreground">
+              {formatNaira(unitPrice * item.quantity)}
+            </p>
+            {hasDiscount && (
+              <p className="mt-0.5 text-[11px] font-semibold text-emerald-600">
+                Bulk discount: {formatNaira(unitPrice)} each
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="mt-3 flex items-center gap-3">
