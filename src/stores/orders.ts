@@ -151,6 +151,7 @@ type OrderState = {
   loading: boolean;
 
   loadFromSupabase: () => Promise<void>;
+  fetchPaymentProof: (orderId: string) => Promise<PaymentProof | null>;
   addOrder: (
     order: Omit<
       Order,
@@ -187,7 +188,7 @@ export const useOrders = create<OrderState>()((set, get) => ({
     try {
       const { data, error } = await supabase
         .from("orders")
-        .select("*")
+        .select("id, order_number, customer_name, customer_email, customer_phone, membership_number, items, fulfillment_method, conference_pickup, delegate_pickup, delivery, subtotal, delivery_fee, grand_total, status, timeline, pickup_code, pickup_verified, created_at, updated_at")
         .order("created_at", { ascending: true });
 
       if (error) {
@@ -281,6 +282,24 @@ export const useOrders = create<OrderState>()((set, get) => ({
           : o,
       ),
     }));
+  },
+
+  fetchPaymentProof: async (orderId) => {
+    const { data, error } = await supabase
+      .from("orders")
+      .select("payment_proof")
+      .eq("id", orderId)
+      .single();
+    if (error || !data) return null;
+    const proof = (data.payment_proof as PaymentProof) ?? null;
+    if (proof) {
+      set((state) => ({
+        orders: state.orders.map((o) =>
+          o.id === orderId ? { ...o, paymentProof: proof } : o,
+        ),
+      }));
+    }
+    return proof;
   },
 
   getOrder: (orderId) => get().orders.find((o) => o.id === orderId),

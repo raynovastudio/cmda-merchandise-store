@@ -9,7 +9,7 @@ import {
   Printer,
   RefreshCw,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   useOrders,
   ORDER_STATUS_LABELS,
@@ -31,10 +31,19 @@ function AdminOrders() {
   const updateOrderStatus = useOrders((s) => s.updateOrderStatus);
   const loading = useOrders((s) => s.loading);
   const loadFromSupabase = useOrders((s) => s.loadFromSupabase);
+  const fetchPaymentProof = useOrders((s) => s.fetchPaymentProof);
   const [search, setSearch] = useState("");
   const [filterTab, setFilterTab] = useState<FilterTab>("all");
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [showQR, setShowQR] = useState(false);
+
+  const selectedOrder = orders.find((o) => o.id === selectedOrderId) ?? null;
+
+  useEffect(() => {
+    if (selectedOrder && !selectedOrder.paymentProof) {
+      fetchPaymentProof(selectedOrder.id);
+    }
+  }, [selectedOrder?.id]);
 
   const filtered = orders.filter((o) => {
     if (search) {
@@ -157,7 +166,7 @@ function AdminOrders() {
     return (
       <div className="space-y-6">
         <button
-          onClick={() => setSelectedOrder(null)}
+          onClick={() => setSelectedOrderId(null)}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900"
         >
           ← Back to orders
@@ -219,10 +228,6 @@ function AdminOrders() {
                   <button
                     onClick={() => {
                       handleApprovePayment(selectedOrder.id);
-                      setSelectedOrder({
-                        ...selectedOrder,
-                        status: "payment-verified",
-                      });
                     }}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white"
                   >
@@ -231,10 +236,6 @@ function AdminOrders() {
                   <button
                     onClick={() => {
                       handleRejectPayment(selectedOrder.id);
-                      setSelectedOrder({
-                        ...selectedOrder,
-                        status: "cancelled",
-                      });
                     }}
                     className="inline-flex items-center gap-1.5 rounded-xl bg-red-50 px-4 py-2 text-sm font-semibold text-red-600"
                   >
@@ -550,7 +551,7 @@ function AdminOrders() {
           {filtered.map((order) => (
             <button
               key={order.id}
-              onClick={() => setSelectedOrder(order)}
+              onClick={() => setSelectedOrderId(order.id)}
               className="w-full rounded-2xl border border-gray-200 bg-white p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-card"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
